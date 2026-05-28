@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AmbulERT — Emergency Vehicle System</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+:root{
+  --red:#FF1A1A;--amber:#FF9500;--green:#00E676;--blue:#2979FF;
+  --bg:#080808;--surface:#101010;--s2:#181818;--s3:#222;
+  --border:#252525;--b2:#303030;--text:#EFEFEF;--muted:#666;--m2:#444;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;}
+#app{display:grid;grid-template-rows:56px 1fr;grid-template-columns:320px 1fr 300px;height:100vh;}
+
+header{grid-column:1/-1;background:rgba(8,8,8,.97);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1.4rem;z-index:200;}
+.logo{display:flex;align-items:center;gap:9px;font-family:'Bebas Neue',sans-serif;font-size:1.45rem;letter-spacing:3px;}
+.logo-box{width:32px;height:32px;background:var(--red);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.95rem;animation:pbox 2s infinite;}
+@keyframes pbox{0%,100%{box-shadow:0 0 0 0 rgba(255,26,26,.6);}50%{box-shadow:0 0 0 7px rgba(255,26,26,0);}}
+.hright{display:flex;align-items:center;gap:.8rem;}
+.livepill{display:flex;align-items:center;gap:7px;font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:1.5px;color:var(--green);background:rgba(0,230,118,.07);border:1px solid rgba(0,230,118,.2);padding:5px 12px;border-radius:100px;}
+.livdot{width:6px;height:6px;border-radius:50%;background:var(--green);animation:blk 1.2s infinite;}
+@keyframes blk{0%,100%{opacity:1;}50%{opacity:.15;}}
+.tabs{display:flex;gap:3px;background:var(--s2);border-radius:8px;padding:3px;}
+.tab{font-family:'JetBrains Mono',monospace;font-size:.62rem;letter-spacing:1px;padding:5px 13px;border-radius:5px;cursor:pointer;border:none;background:transparent;color:var(--muted);transition:.2s;}
+.tab.on{background:var(--red);color:#fff;}
+
+#left{background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;}
+#left::-webkit-scrollbar{width:3px;}#left::-webkit-scrollbar-thumb{background:var(--b2);}
+#right{background:var(--surface);border-left:1px solid var(--border);overflow-y:auto;}
+#right::-webkit-scrollbar{width:3px;}#right::-webkit-scrollbar-thumb{background:var(--b2);}
+#mapwrap{position:relative;}
+#map{width:100%;height:100%;}
+.leaflet-tile-pane{filter:brightness(.45) saturate(.5) hue-rotate(185deg) invert(1);}
+.leaflet-control-attribution{display:none!important;}
+.leaflet-control-zoom a{background:var(--surface)!important;color:var(--text)!important;border-color:var(--border)!important;}
+.leaflet-popup-content-wrapper{background:var(--s2);color:var(--text);border:1px solid var(--b2);border-radius:10px;}
+.leaflet-popup-tip{background:var(--s2);}
+
+.psec{padding:.9rem 1.1rem;border-bottom:1px solid var(--border);}
+.plbl{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:2px;color:var(--red);text-transform:uppercase;margin-bottom:.4rem;display:flex;align-items:center;gap:7px;}
+.plbl::before{content:'';width:14px;height:1px;background:var(--red);}
+.ptitle{font-family:'Bebas Neue',sans-serif;font-size:1.2rem;letter-spacing:1.5px;}
+.fgrid{display:grid;grid-template-columns:1fr 1fr;gap:.55rem;padding:.9rem 1.1rem;}
+.fgrid.one{grid-template-columns:1fr;}
+.fg{display:flex;flex-direction:column;gap:3px;}
+.fg.s2{grid-column:1/-1;}
+label{font-family:'JetBrains Mono',monospace;font-size:.56rem;letter-spacing:1.5px;color:var(--muted);text-transform:uppercase;}
+input,select{background:var(--s2);border:1px solid var(--b2);border-radius:8px;padding:8px 11px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:.83rem;outline:none;transition:.2s;width:100%;}
+input:focus,select:focus{border-color:var(--red);box-shadow:0 0 0 3px rgba(255,26,26,.1);}
+input::placeholder{color:var(--m2);}
+select option{background:var(--s2);}
+.btn{border:none;cursor:pointer;border-radius:9px;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;transition:.2s;}
+.btnr{background:var(--red);color:#fff;padding:10px 18px;font-size:.95rem;width:100%;}
+.btnr:hover{background:#cc0000;}
+.btnr:active{transform:scale(.98);}
+.btns{background:var(--s3);color:var(--text);padding:5px 12px;font-size:.72rem;border:1px solid var(--b2);}
+.btns:hover{border-color:var(--red);color:var(--red);}
+.amblist{padding:.5rem 1.1rem;display:flex;flex-direction:column;gap:.5rem;}
+.acard{background:var(--s2);border:1px solid var(--b2);border-radius:11px;padding:.8rem .95rem;transition:.2s;position:relative;overflow:hidden;}
+.acard::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--m2);}
+.acard.ce::before{background:var(--red);animation:bp .8s infinite alternate;}
+.acard.ca::before{background:var(--green);}
+@keyframes bp{from{opacity:.4;}to{opacity:1;}}
+.atop{display:flex;justify-content:space-between;align-items:center;margin-bottom:.3rem;}
+.aplate{font-family:'Bebas Neue',sans-serif;font-size:1rem;letter-spacing:1px;}
+.astatus{font-family:'JetBrains Mono',monospace;font-size:.56rem;letter-spacing:1px;padding:2px 8px;border-radius:100px;text-transform:uppercase;}
+.ss{background:rgba(102,102,102,.15);color:var(--muted);}
+.se{background:rgba(255,26,26,.15);color:var(--red);}
+.sv{background:rgba(0,230,118,.15);color:var(--green);}
+.ainfo{font-size:.76rem;color:var(--muted);margin-bottom:.45rem;}
+.aacts{display:flex;gap:.4rem;flex-wrap:wrap;}
+
+#modal{position:fixed;inset:0;z-index:500;background:rgba(0,0,0,.82);backdrop-filter:blur(8px);display:none;align-items:center;justify-content:center;}
+#modal.on{display:flex;}
+.mbox{background:var(--surface);border:1px solid var(--b2);border-radius:18px;padding:1.8rem;width:400px;max-width:92vw;box-shadow:0 24px 64px rgba(0,0,0,.6);animation:min .3s cubic-bezier(.34,1.56,.64,1);}
+@keyframes min{from{opacity:0;transform:scale(.9) translateY(20px);}to{opacity:1;transform:scale(1) translateY(0);}}
+.mtitle{font-family:'Bebas Neue',sans-serif;font-size:1.7rem;letter-spacing:2px;margin-bottom:1.2rem;}
+.mtitle span{color:var(--red);}
+.mdet{background:var(--s2);border-radius:10px;padding:.9rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;line-height:2;color:#aaa;margin-bottom:.9rem;}
+.mfoot{display:flex;gap:.65rem;margin-top:1.2rem;}
+.mfoot .btn{flex:1;}
+
+#simbar{position:absolute;bottom:1rem;left:50%;transform:translateX(-50%);background:rgba(8,8,8,.93);border:1px solid var(--b2);border-radius:13px;padding:.7rem 1.3rem;display:none;align-items:center;gap:1rem;font-family:'JetBrains Mono',monospace;font-size:.72rem;z-index:300;backdrop-filter:blur(12px);min-width:340px;}
+#simbar.on{display:flex;}
+.sbar{flex:1;height:4px;background:var(--b2);border-radius:2px;overflow:hidden;}
+.sfill{height:100%;background:linear-gradient(90deg,var(--red),var(--amber));width:0%;transition:width .4s linear;}
+
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;padding:.9rem 1.1rem;border-bottom:1px solid var(--border);}
+.stat{text-align:center;}
+.stn{font-family:'Bebas Neue',sans-serif;font-size:1.5rem;color:var(--red);}
+.stl{font-size:.62rem;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;}
+.loglist{padding:.5rem 1.1rem;display:flex;flex-direction:column;gap:.45rem;}
+.logitem{background:var(--s2);border:1px solid var(--border);border-radius:9px;padding:.7rem .9rem;display:flex;gap:.7rem;align-items:flex-start;animation:lin .35s ease;}
+@keyframes lin{from{opacity:0;transform:translateX(10px);}to{opacity:1;transform:translateX(0);}}
+.lico{width:28px;height:28px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:.8rem;flex-shrink:0;}
+.lr{background:rgba(255,26,26,.12);}.la{background:rgba(255,149,0,.12);}.lg{background:rgba(0,230,118,.12);}.lb{background:rgba(41,121,255,.12);}
+.lbody{flex:1;}.ltitle{font-size:.78rem;font-weight:500;margin-bottom:1px;}.lsub{font-size:.68rem;color:var(--muted);line-height:1.4;}
+.ltime{font-family:'JetBrains Mono',monospace;font-size:.58rem;color:var(--m2);white-space:nowrap;}
+
+.smsbox{margin:0 1.1rem .9rem;background:var(--s2);border:1px solid var(--b2);border-radius:11px;padding:.9rem;}
+.smslbl{font-family:'JetBrains Mono',monospace;font-size:.58rem;letter-spacing:1.5px;color:var(--muted);margin-bottom:.4rem;}
+.smstxt{font-family:'JetBrains Mono',monospace;font-size:.68rem;line-height:1.9;color:#aaa;}
+.smstxt .hi{color:var(--amber);}.smstxt .pl{color:var(--red);font-weight:700;}
+
+.mydot{width:14px;height:14px;border-radius:50%;background:var(--blue);border:2px solid #fff;box-shadow:0 0 0 5px rgba(41,121,255,.25);}
+.ambdot{width:34px;height:34px;background:var(--red);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:1rem;border:2px solid rgba(255,255,255,.25);animation:mp 1.5s infinite;}
+@keyframes mp{0%{box-shadow:0 0 0 0 rgba(255,26,26,.6);}70%{box-shadow:0 0 0 12px rgba(255,26,26,0);}100%{box-shadow:0 0 0 0 rgba(255,26,26,0);}}
+.destdot{width:26px;height:26px;background:var(--green);border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid rgba(255,255,255,.3);box-shadow:0 2px 12px rgba(0,230,118,.4);display:flex;align-items:center;justify-content:center;}
+.destin{transform:rotate(45deg);font-size:.85rem;}
+
+#toast{position:fixed;bottom:1.4rem;right:1.4rem;background:var(--surface);border:1px solid var(--green);border-radius:11px;padding:10px 18px;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--green);z-index:999;transform:translateY(70px);opacity:0;transition:.4s cubic-bezier(.34,1.56,.64,1);}
+#toast.on{transform:translateY(0);opacity:1;}
+.empty{text-align:center;color:var(--muted);font-size:.78rem;padding:1.8rem;}
+::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-thumb{background:var(--b2);}
+@media(max-width:900px){#app{grid-template-columns:260px 1fr 0;}#right{display:none;}}
+@media(max-width:600px){#app{grid-template-columns:1fr;grid-template-rows:56px 38vh 1fr;}#mapwrap{grid-row:2;}#left{grid-row:3;}#right{display:none;}}
+</style>
+</head>
+<body>
+<div id="app">
+
+<header>
+  <div class="logo">
+    <div class="logo-box">🚑</div>
+    AMBULERT
+    <span style="font-family:'JetBrains Mono',monospace;font-size:.56rem;color:var(--muted);letter-spacing:1px;margin-left:4px;">DISPATCH v2</span>
+  </div>
+  <div class="hright">
+    <div class="tabs">
+      <button class="tab on" onclick="setTab('admin')">ADMIN</button>
+      <button class="tab" onclick="setTab('dispatch')">DISPATCH</button>
+    </div>
+    <div class="livepill"><div class="livdot"></div>LIVE GPS</div>
+  </div>
+</header>
+
+<div id="left">
+  <div id="tadmin">
+    <div class="psec"><div class="plbl">Admin Panel</div><div class="ptitle">REGISTER UNIT</div></div>
+    <div class="fgrid">
+      <div class="fg s2"><label>Driver Name</label><input id="adrv" placeholder="e.g. Ravi Kumar"></div>
+      <div class="fg"><label>Number Plate</label><input id="aplt" placeholder="JK01AB1234"></div>
+      <div class="fg"><label>Unit ID</label><input id="aid" placeholder="AMB-007"></div>
+      <div class="fg"><label>Contact</label><input id="aphn" placeholder="+91 9876543210"></div>
+      <div class="fg"><label>Hospital</label><input id="ahsp" placeholder="SMHS Hospital"></div>
+    </div>
+    <div style="padding:0 1.1rem .9rem"><button class="btn btnr" onclick="addUnit()">+ ADD UNIT TO FLEET</button></div>
+    <div class="psec"><div class="plbl">Fleet</div><div class="ptitle">REGISTERED UNITS</div></div>
+    <div class="amblist" id="amblist"><div class="empty">No units yet. Add one above.</div></div>
+  </div>
+
+  <div id="tdisp" style="display:none">
+    <div class="psec"><div class="plbl">Dispatch</div><div class="ptitle">SEND ALERT</div></div>
+    <div class="fgrid one">
+      <div class="fg"><label>Select Unit</label>
+        <select id="dunit" onchange="prevSMS()"><option value="">— Choose Ambulance —</option></select>
+      </div>
+      <div class="fg"><label>Alert Phone (recipient)</label><input id="dphn" placeholder="+91 9876543210" oninput="prevSMS()"></div>
+      <div class="fg" style="position:relative">
+        <label>Destination</label>
+        <input id="ddest" placeholder="Search hospital, area..." autocomplete="off" oninput="searchLoc()" onkeydown="if(event.key==='Escape')closeDrop()">
+        <div id="locdrop" style="display:none;position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--s2);border:1px solid var(--b2);border-radius:9px;z-index:9999;max-height:190px;overflow-y:auto;box-shadow:0 10px 28px rgba(0,0,0,.6);"></div>
+      </div>
+    </div>
+    <div class="smsbox">
+      <div class="smslbl">// SMS PREVIEW</div>
+      <div class="smstxt" id="smsprev" style="color:var(--m2)">Select a unit to preview...</div>
+    </div>
+    <div style="padding:0 1.1rem .9rem"><button class="btn btnr" onclick="openModal()">🚨 DISPATCH &amp; SIMULATE</button></div>
+  </div>
+</div>
+
+<div id="mapwrap">
+  <div id="map"></div>
+  <div id="simbar">
+    <span>🚑</span>
+    <span id="simlbl" style="color:var(--amber);font-size:.7rem">—</span>
+    <div class="sbar"><div class="sfill" id="sfill"></div></div>
+    <span id="spct" style="color:var(--red);width:34px;text-align:right">0%</span>
+    <span id="seta" style="color:var(--muted)">ETA --</span>
+  </div>
+</div>
+
+<div id="right">
+  <div class="psec"><div class="plbl">Activity</div><div class="ptitle">LIVE LOG</div></div>
+  <div class="stats">
+    <div class="stat"><div class="stn" id="sttotal">0</div><div class="stl">Sent</div></div>
+    <div class="stat"><div class="stn" id="stact">0</div><div class="stl">En Route</div></div>
+    <div class="stat"><div class="stn" id="stunits">0</div><div class="stl">Units</div></div>
+  </div>
+  <div class="loglist" id="loglist">
+    <div class="logitem">
+      <div class="lico lb">📡</div>
+      <div class="lbody"><div class="ltitle">System Online</div><div class="lsub">GPS &amp; alert system ready</div></div>
+      <div class="ltime">now</div>
+    </div>
+  </div>
+</div>
+</div>
+
+<div id="modal">
+  <div class="mbox">
+    <div class="mtitle">CONFIRM <span>DISPATCH</span></div>
+    <div class="mdet" id="mdet"></div>
+    <div style="font-size:.8rem;color:var(--muted)">Ambulance will simulate moving from your live GPS location to the destination on the map in real time.</div>
+    <div class="mfoot">
+      <button class="btn btns" onclick="closeModal()" style="padding:10px 0;font-size:.85rem">CANCEL</button>
+      <button class="btn btnr" onclick="confirmDispatch()">🚨 CONFIRM &amp; GO</button>
+    </div>
+  </div>
+</div>
+<div id="toast"></div>
+
+<script>
+let map, myMarker, myPos = null;
+let units = [], pending = null, totalSent = 0;
+
+function initMap() {
+  map = L.map('map', { zoomControl: true, attributionControl: false });
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
+    maxZoom: 20,
+    subdomains: 'abcd'
+  }).addTo(map);
+  if (navigator.geolocation) {
+    navigator.geolocation.watchPosition(pos => {
+      myPos = [pos.coords.latitude, pos.coords.longitude];
+      if (!myMarker) {
+        map.setView(myPos, 15);
+        const el = document.createElement('div'); el.className = 'mydot';
+        myMarker = L.marker(myPos, { icon: L.divIcon({ className:'', html:el, iconSize:[14,14], iconAnchor:[7,7] }) })
+          .addTo(map).bindPopup('<b style="font-family:Bebas Neue,sans-serif;letter-spacing:1px">YOUR LOCATION</b>');
+        toast('📍 Live GPS acquired');
+        addLog('📍','lb','GPS Acquired','Your live location is active on map');
+      } else { myMarker.setLatLng(myPos); }
+    }, () => {
+      myPos = [34.0837, 74.7973];
+      map.setView(myPos, 14);
+      const el = document.createElement('div'); el.className = 'mydot';
+      myMarker = L.marker(myPos, { icon: L.divIcon({ className:'', html:el, iconSize:[14,14], iconAnchor:[7,7] }) })
+        .addTo(map).bindPopup('<b>BASE LOCATION — Srinagar (fallback)</b>');
+      addLog('📍','la','GPS Fallback','Using Srinagar as default location');
+    }, { enableHighAccuracy: true, maximumAge: 4000 });
+  }
+}
+
+function setTab(t) {
+  document.querySelectorAll('.tab').forEach(p => p.classList.toggle('on', p.textContent.toLowerCase() === t));
+  document.getElementById('tadmin').style.display = t==='admin' ? '' : 'none';
+  document.getElementById('tdisp').style.display  = t==='dispatch' ? '' : 'none';
+}
+
+function addUnit() {
+  const driver=document.getElementById('adrv').value.trim(), plate=document.getElementById('aplt').value.trim();
+  const id=document.getElementById('aid').value.trim()||'AMB-'+String(units.length+1).padStart(3,'0');
+  const phone=document.getElementById('aphn').value.trim(), hospital=document.getElementById('ahsp').value.trim();
+  if (!driver||!plate) { toast('⚠️ Driver name & plate required',true); return; }
+  units.push({ id, driver, plate, phone, hospital, status:'standby', marker:null, destMarker:null, line:null });
+  const opt=document.createElement('option'); opt.value=units.length-1; opt.textContent=`${id} — ${plate}`;
+  document.getElementById('dunit').appendChild(opt);
+  renderUnits();
+  document.getElementById('stunits').textContent = units.length;
+  ['adrv','aplt','aid','aphn','ahsp'].forEach(x => document.getElementById(x).value='');
+  addLog('🚑','lr',id+' Registered',driver+' · '+plate);
+  toast('✅ '+id+' added to fleet');
+}
+
+function renderUnits() {
+  const list = document.getElementById('amblist');
+  if (!units.length) { list.innerHTML='<div class="empty">No units yet.</div>'; return; }
+  list.innerHTML='';
+  units.forEach((u,i) => {
+    const cls  = u.status==='enroute'?'ce':u.status==='arrived'?'ca':'';
+    const scls = u.status==='standby'?'ss':u.status==='enroute'?'se':'sv';
+    const acts = u.status==='standby'
+      ? `<button class="btn btns" onclick="quickDispatch(${i})">🚨 DISPATCH</button><button class="btn btns" onclick="locUnit(${i})">📍 MAP</button>`
+      : u.status==='enroute'
+      ? `<button class="btn btns" style="color:var(--amber);border-color:var(--amber)">⏳ EN ROUTE</button><button class="btn btns" onclick="locUnit(${i})">📍 MAP</button>`
+      : `<button class="btn btns" style="color:var(--green);border-color:var(--green)" onclick="resetUnit(${i})">✅ RESET</button>`;
+    const d = document.createElement('div');
+    d.className='acard '+cls;
+    d.innerHTML=`<div class="atop"><div class="aplate">${u.plate}</div><div class="astatus ${scls}">${u.status}</div></div><div class="ainfo">${u.id} · ${u.driver}${u.hospital?' · '+u.hospital:''}</div><div class="aacts">${acts}</div>`;
+    list.appendChild(d);
+  });
+}
+
+function locUnit(i) {
+  const u=units[i];
+  if (u.marker) map.flyTo(u.marker.getLatLng(),16,{duration:1});
+  else if (myPos) map.flyTo(myPos,15,{duration:1});
+}
+
+function quickDispatch(i) {
+  document.getElementById('dunit').value=i;
+  prevSMS(); setTab('dispatch');
+}
+
+function prevSMS() {
+  const idx=document.getElementById('dunit').value;
+  const dest=document.getElementById('ddest').value||'Destination';
+  if (idx==='') { document.getElementById('smsprev').textContent='Select a unit to preview...'; return; }
+  const u=units[idx];
+  document.getElementById('smsprev').innerHTML=`🚨 <span class="hi">AMBULANCE ALERT</span><br>Unit: <span class="pl">${u.id}</span><br>Plate: <span class="pl">${u.plate}</span><br>Driver: <span class="hi">${u.driver}</span><br>Heading to: ${dest}<br><br>⚠️ Please clear the road.<br><span style="color:var(--m2)">— AmbulERT System</span>`;
+}
+
+function openModal() {
+  const idx=document.getElementById('dunit').value;
+  const dest=document.getElementById('ddest').value.trim();
+  const phone=document.getElementById('dphn').value.trim();
+  if (idx==='') { toast('⚠️ Select a unit first',true); return; }
+  if (!dest)    { toast('⚠️ Enter a destination',true); return; }
+  if (!destLatLng) { toast('⚠️ Pick a location from the dropdown',true); return; }
+  const u=units[idx]; pending={idx:+idx,dest,phone,coords:destLatLng};
+  document.getElementById('mdet').innerHTML=`Unit: <span style="color:var(--red)">${u.id}</span><br>Driver: ${u.driver}<br>Plate: <span style="color:var(--amber)">${u.plate}</span><br>Destination: ${dest}<br>Coords: ${destLatLng[0].toFixed(4)}, ${destLatLng[1].toFixed(4)}<br>Alert to: ${phone||'No SMS (demo)'}`;
+  document.getElementById('modal').classList.add('on');
+}
+function closeModal() { document.getElementById('modal').classList.remove('on'); }
+
+function confirmDispatch() {
+  const saved=pending; pending=null;
+  closeModal();
+  if (!saved) return;
+  const {idx,dest}=saved; const u=units[idx];
+  u.status='enroute'; renderUnits();
+  totalSent++; document.getElementById('sttotal').textContent=totalSent;
+  updActive();
+  addLog('🚨','lr',u.id+' Dispatched',u.driver+' → '+dest);
+  toast('🚨 '+u.id+' dispatched — simulating route');
+  simulate(idx, dest, saved.coords);
+}
+
+function simulate(idx, destLabel, destCoords) {
+  const u=units[idx];
+  const base = myPos || [34.0837, 74.7973];
+  const start=[...base];
+  const dest = destCoords ? [...destCoords] : [start[0]+(Math.random()*.022-.004), start[1]+(Math.random()*.022+.006)];
+
+  if (u.marker)     { map.removeLayer(u.marker); }
+  if (u.destMarker) { map.removeLayer(u.destMarker); }
+  if (u.line)       { map.removeLayer(u.line); }
+
+  const ae=document.createElement('div'); ae.className='ambdot'; ae.innerHTML='🚑';
+  u.marker=L.marker(start,{icon:L.divIcon({className:'',html:ae,iconSize:[34,34],iconAnchor:[17,17]})})
+    .addTo(map).bindPopup(`<b>${u.id}</b><br>${u.driver}<br>${u.plate}`);
+
+  const de=document.createElement('div'); de.className='destdot'; de.innerHTML='<div class="destin">🏥</div>';
+  u.destMarker=L.marker(dest,{icon:L.divIcon({className:'',html:de,iconSize:[26,26],iconAnchor:[13,26]})})
+    .addTo(map).bindPopup(`<b>DESTINATION</b><br>${destLabel}`);
+
+  u.line=L.polyline([start,dest],{color:'#FF1A1A',weight:3,opacity:.55,dashArray:'8,6'}).addTo(map);
+  map.fitBounds(L.latLngBounds([start,dest]),{padding:[70,70]});
+
+  const bar=document.getElementById('simbar'), fill=document.getElementById('sfill');
+  const pct=document.getElementById('spct'), eta=document.getElementById('seta');
+  document.getElementById('simlbl').textContent=u.id;
+  bar.classList.add('on');
+
+  const STEPS=100, DUR=20000; let step=0;
+  addLog('📡','la',u.id+' En Route','Heading to '+destLabel);
+
+  const timer=setInterval(()=>{
+    step++;
+    const p=step/STEPS;
+    u.marker.setLatLng([start[0]+(dest[0]-start[0])*p, start[1]+(dest[1]-start[1])*p]);
+    fill.style.width=(p*100)+'%';
+    pct.textContent=Math.round(p*100)+'%';
+    const s=Math.round((1-p)*DUR/1000);
+    eta.textContent=s>0?'ETA '+s+'s':'Arriving...';
+    if (step>=STEPS) {
+      clearInterval(timer);
+      u.status='arrived'; bar.classList.remove('on'); fill.style.width='0%';
+      if (u.line){map.removeLayer(u.line);u.line=null;}
+      renderUnits(); updActive();
+      addLog('✅','lg',u.id+' Arrived','Reached '+destLabel);
+      toast('✅ '+u.id+' arrived at '+destLabel);
+    }
+  }, DUR/STEPS);
+}
+
+function resetUnit(i) {
+  const u=units[i]; u.status='standby';
+  if (u.marker){map.removeLayer(u.marker);u.marker=null;}
+  if (u.destMarker){map.removeLayer(u.destMarker);u.destMarker=null;}
+  if (u.line){map.removeLayer(u.line);u.line=null;}
+  renderUnits(); updActive();
+  addLog('🔄','lb',u.id+' Reset','Back on standby');
+}
+
+function updActive() {
+  document.getElementById('stact').textContent=units.filter(x=>x.status==='enroute').length;
+}
+
+function addLog(icon,cls,title,sub) {
+  const list=document.getElementById('loglist');
+  const t=new Date(), ts=t.getHours().toString().padStart(2,'0')+':'+t.getMinutes().toString().padStart(2,'0');
+  const item=document.createElement('div'); item.className='logitem';
+  item.innerHTML=`<div class="lico ${cls}">${icon}</div><div class="lbody"><div class="ltitle">${title}</div><div class="lsub">${sub}</div></div><div class="ltime">${ts}</div>`;
+  list.insertBefore(item,list.firstChild);
+  if (list.children.length>25) list.removeChild(list.lastChild);
+}
+
+let tt;
+function toast(msg,warn=false) {
+  const el=document.getElementById('toast');
+  el.textContent=msg; el.style.borderColor=warn?'var(--amber)':'var(--green)'; el.style.color=warn?'var(--amber)':'var(--green)';
+  el.classList.add('on'); clearTimeout(tt); tt=setTimeout(()=>el.classList.remove('on'),3000);
+}
+
+function seed() {
+  const demos=[
+    {driver:'Ravi Kumar',plate:'JK01AB1234',id:'AMB-001',phone:'+91 9419001234',hospital:'SMHS Hospital'},
+    {driver:'Aijaz Mir',plate:'JK08ZZ0012',id:'AMB-002',phone:'+91 9858005678',hospital:'SKIMS Soura'},
+    {driver:'Mushtaq Lone',plate:'JK02XY9988',id:'AMB-003',phone:'+91 7006001122',hospital:'Bone & Spine'},
+  ];
+  demos.forEach(d=>{
+    document.getElementById('adrv').value=d.driver; document.getElementById('aplt').value=d.plate;
+    document.getElementById('aid').value=d.id; document.getElementById('aphn').value=d.phone;
+    document.getElementById('ahsp').value=d.hospital; addUnit();
+  });
+}
+
+// ── LOCATION SEARCH ──
+let destLatLng = null;
+let searchTimer = null;
+
+function searchLoc() {
+  const q = document.getElementById('ddest').value.trim();
+  destLatLng = null; // reset when user types again
+  prevSMS();
+  clearTimeout(searchTimer);
+  const drop = document.getElementById('locdrop');
+  if (q.length < 3) { drop.style.display='none'; return; }
+  drop.style.display='block';
+  drop.innerHTML='<div style="padding:10px 14px;font-family:JetBrains Mono,monospace;font-size:.65rem;color:var(--muted)">Searching...</div>';
+  searchTimer = setTimeout(async () => {
+    try {
+      const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=8&addressdetails=1&featuretype=settlement&featuretype=road&featuretype=house&bounded=0`, {
+        headers: { 'Accept-Language': 'en', 'User-Agent': 'AmbulERT/1.0' }
+      });
+      const data = await res.json();
+      if (!data.length) {
+        drop.innerHTML='<div style="padding:10px 14px;font-family:JetBrains Mono,monospace;font-size:.65rem;color:var(--muted)">No results found</div>';
+        return;
+      }
+      drop.innerHTML='';
+      data.forEach(place => {
+        const name = place.display_name;
+        const lat = parseFloat(place.lat), lng = parseFloat(place.lon);
+        const primary = place.name || place.address?.road || place.address?.suburb || name.split(',')[0];
+        const secondary = [place.address?.suburb, place.address?.city||place.address?.town||place.address?.village, place.address?.state].filter(Boolean).join(', ');
+        const typeTag = place.type || place.class || '';
+        const tagColor = typeTag.includes('road')||typeTag.includes('street')||typeTag.includes('highway') ? 'var(--amber)' : typeTag.includes('hospital')||typeTag.includes('clinic') ? 'var(--red)' : 'var(--blue)';
+        const item = document.createElement('div');
+        item.style.cssText='padding:9px 14px;cursor:pointer;border-bottom:1px solid var(--border);font-size:.75rem;line-height:1.5;transition:.15s;display:flex;align-items:flex-start;gap:8px;';
+        item.innerHTML=`
+          <div style="margin-top:2px;width:6px;height:6px;border-radius:50%;background:${tagColor};flex-shrink:0;margin-top:5px"></div>
+          <div style="flex:1;min-width:0;">
+            <div style="color:var(--text);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${primary}</div>
+            <div style="color:var(--muted);font-size:.63rem;font-family:'JetBrains Mono',monospace;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${secondary||name.split(',').slice(1,3).join(',')}</div>
+          </div>
+          <div style="font-family:'JetBrains Mono',monospace;font-size:.55rem;color:${tagColor};background:${tagColor}22;padding:2px 6px;border-radius:4px;flex-shrink:0;text-transform:uppercase;letter-spacing:.5px">${typeTag}</div>
+        `;
+        item.onmouseenter=()=>item.style.background='var(--s3)';
+        item.onmouseleave=()=>item.style.background='';
+        item.onclick=()=>selectLoc(name, lat, lng);
+        drop.appendChild(item);
+      });
+    } catch(e) {
+      drop.innerHTML='<div style="padding:10px 14px;font-family:JetBrains Mono,monospace;font-size:.65rem;color:var(--red)">Search failed — check connection</div>';
+    }
+  }, 450);
+}
+
+function selectLoc(name, lat, lng) {
+  destLatLng = [lat, lng];
+  document.getElementById('ddest').value = name;
+  closeDrop();
+  prevSMS();
+  // Preview pin on map
+  map.flyTo([lat, lng], 15, { duration: 1.2 });
+  if (window._previewMarker) map.removeLayer(window._previewMarker);
+  const pe = document.createElement('div');
+  pe.className='destdot'; pe.innerHTML='<div class="destin">📍</div>';
+  window._previewMarker = L.marker([lat,lng], {
+    icon: L.divIcon({ className:'', html:pe, iconSize:[26,26], iconAnchor:[13,26] })
+  }).addTo(map).bindPopup(`<b>DESTINATION PREVIEW</b><br>${name}`).openPopup();
+}
+
+function closeDrop() { document.getElementById('locdrop').style.display='none'; }
+document.addEventListener('click', e => { if (!e.target.closest('#tdisp')) closeDrop(); });
+
+window.onload=()=>{ initMap(); seed(); };
+</script>
+</body>
+</html>

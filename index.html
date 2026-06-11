@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AmbulERT — Emergency Vehicle System</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Ambuways — Emergency Vehicle System</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -12,12 +12,18 @@
   --red:#FF1A1A;--amber:#FF9500;--green:#00E676;--blue:#2979FF;
   --bg:#080808;--surface:#101010;--s2:#181818;--s3:#222;
   --border:#252525;--b2:#303030;--text:#EFEFEF;--muted:#666;--m2:#444;
+  --header-h:56px;
 }
-*{margin:0;padding:0;box-sizing:border-box;}
-html,body{height:100%;overflow:hidden;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;}
-#app{display:grid;grid-template-rows:56px 1fr;grid-template-columns:320px 1fr 300px;height:100vh;}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;overflow:hidden;}
 
-header{grid-column:1/-1;background:rgba(8,8,8,.97);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 1.4rem;z-index:200;}
+/* ── DESKTOP ── */
+#app{display:grid;grid-template-rows:var(--header-h) 1fr;grid-template-columns:320px 1fr 300px;height:100vh;}
+
+header{
+  grid-column:1/-1;background:rgba(8,8,8,.97);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;padding:0 1.4rem;z-index:200;
+}
 .logo{display:flex;align-items:center;gap:9px;font-family:'Bebas Neue',sans-serif;font-size:1.45rem;letter-spacing:3px;}
 .logo-box{width:32px;height:32px;background:var(--red);border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:.95rem;animation:pbox 2s infinite;}
 @keyframes pbox{0%,100%{box-shadow:0 0 0 0 rgba(255,26,26,.6);}50%{box-shadow:0 0 0 7px rgba(255,26,26,0);}}
@@ -33,7 +39,7 @@ header{grid-column:1/-1;background:rgba(8,8,8,.97);border-bottom:1px solid var(-
 #left::-webkit-scrollbar{width:3px;}#left::-webkit-scrollbar-thumb{background:var(--b2);}
 #right{background:var(--surface);border-left:1px solid var(--border);overflow-y:auto;}
 #right::-webkit-scrollbar{width:3px;}#right::-webkit-scrollbar-thumb{background:var(--b2);}
-#mapwrap{position:relative;}
+#mapwrap{position:relative;overflow:hidden;}
 #map{width:100%;height:100%;}
 .leaflet-tile-pane{filter:brightness(.45) saturate(.5) hue-rotate(185deg) invert(1);}
 .leaflet-control-attribution{display:none!important;}
@@ -58,6 +64,9 @@ select option{background:var(--s2);}
 .btnr{background:var(--red);color:#fff;padding:10px 18px;font-size:.95rem;width:100%;}
 .btnr:hover{background:#cc0000;}
 .btnr:active{transform:scale(.98);}
+.btng{background:#1a73e8;color:#fff;padding:5px 11px;font-size:.72rem;border:none;}
+.btng:hover{background:#1557b0;}
+.btng svg{display:inline;vertical-align:middle;margin-right:4px;}
 .btns{background:var(--s3);color:var(--text);padding:5px 12px;font-size:.72rem;border:1px solid var(--b2);}
 .btns:hover{border-color:var(--red);color:var(--red);}
 .amblist{padding:.5rem 1.1rem;display:flex;flex-direction:column;gap:.5rem;}
@@ -113,12 +122,96 @@ select option{background:var(--s2);}
 .destdot{width:26px;height:26px;background:var(--green);border-radius:50% 50% 50% 0;transform:rotate(-45deg);border:2px solid rgba(255,255,255,.3);box-shadow:0 2px 12px rgba(0,230,118,.4);display:flex;align-items:center;justify-content:center;}
 .destin{transform:rotate(45deg);font-size:.85rem;}
 
-#toast{position:fixed;bottom:1.4rem;right:1.4rem;background:var(--surface);border:1px solid var(--green);border-radius:11px;padding:10px 18px;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--green);z-index:999;transform:translateY(70px);opacity:0;transition:.4s cubic-bezier(.34,1.56,.64,1);}
+#toast{position:fixed;bottom:1.4rem;right:1.4rem;background:var(--surface);border:1px solid var(--green);border-radius:11px;padding:10px 18px;font-family:'JetBrains Mono',monospace;font-size:.72rem;color:var(--green);z-index:999;transform:translateY(70px);opacity:0;transition:.4s cubic-bezier(.34,1.56,.64,1);max-width:90vw;}
 #toast.on{transform:translateY(0);opacity:1;}
 .empty{text-align:center;color:var(--muted);font-size:.78rem;padding:1.8rem;}
 ::-webkit-scrollbar{width:3px;}::-webkit-scrollbar-thumb{background:var(--b2);}
-@media(max-width:900px){#app{grid-template-columns:260px 1fr 0;}#right{display:none;}}
-@media(max-width:600px){#app{grid-template-columns:1fr;grid-template-rows:56px 38vh 1fr;}#mapwrap{grid-row:2;}#left{grid-row:3;}#right{display:none;}}
+
+/* Location dropdown */
+#locdrop{display:none;position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--s2);border:1px solid var(--b2);border-radius:9px;z-index:9999;max-height:220px;overflow-y:auto;box-shadow:0 10px 28px rgba(0,0,0,.6);}
+#locdrop::-webkit-scrollbar{width:3px;}
+#locdrop::-webkit-scrollbar-thumb{background:var(--b2);}
+
+/* ── MOBILE NAV BAR ── */
+#mobibar{display:none;}
+
+/* ── MOBILE PANEL SHEET ── */
+#mobipanel{display:none;}
+
+/* ── RESPONSIVE ── */
+/* Tablet */
+@media(max-width:900px){
+  #app{grid-template-columns:260px 1fr 0;}
+  #right{display:none;}
+}
+
+/* Mobile */
+@media(max-width:600px){
+  #app{
+    display:flex;flex-direction:column;height:100vh;overflow:hidden;
+  }
+  header{flex-shrink:0;padding:0 1rem;}
+  .logo{font-size:1.1rem;}
+  .logo-box{width:26px;height:26px;font-size:.75rem;}
+  .livepill{display:none;}
+  .hright .tabs{display:none;}
+
+  /* Map takes most of screen */
+  #mapwrap{
+    flex:1;min-height:0;position:relative;
+  }
+  #left{display:none;}
+  #right{display:none;}
+
+  /* Bottom sheet */
+  #mobipanel{
+    display:flex;flex-direction:column;
+    flex-shrink:0;
+    background:var(--surface);
+    border-top:1px solid var(--border);
+    height:52vh;
+    overflow:hidden;
+    position:relative;
+  }
+
+  /* Drag handle */
+  #mobipanel::before{
+    content:'';position:absolute;top:8px;left:50%;transform:translateX(-50%);
+    width:36px;height:3px;border-radius:2px;background:var(--b2);
+  }
+
+  /* Mobile tabs inside panel */
+  #mobitabs{
+    display:flex;gap:3px;padding:16px 1rem 8px;
+  }
+  #mobitabs .tab{
+    font-family:'JetBrains Mono',monospace;font-size:.6rem;letter-spacing:1px;
+    padding:5px 12px;border-radius:5px;cursor:pointer;border:none;
+    background:var(--s2);color:var(--muted);transition:.2s;flex:1;text-align:center;
+  }
+  #mobitabs .tab.on{background:var(--red);color:#fff;}
+
+  #mobicontent{overflow-y:auto;flex:1;padding-bottom:8px;}
+  #mobicontent::-webkit-scrollbar{width:3px;}
+  #mobicontent::-webkit-scrollbar-thumb{background:var(--b2);}
+
+  /* Simbar mobile */
+  #simbar{
+    min-width:0;width:calc(100% - 2rem);font-size:.65rem;
+    flex-wrap:wrap;gap:.6rem;padding:.6rem 1rem;
+  }
+
+  /* Stats row compact */
+  .stats{padding:.6rem .9rem;}
+  .stn{font-size:1.2rem;}
+  .loglist{padding:.4rem .9rem;}
+
+  .fgrid{padding:.7rem .9rem;gap:.45rem;}
+  .fgrid:not(.one){grid-template-columns:1fr 1fr;}
+  .psec{padding:.7rem .9rem;}
+  .amblist{padding:.4rem .9rem;}
+  .smsbox{margin:0 .9rem .7rem;}
+}
 </style>
 </head>
 <body>
@@ -127,7 +220,7 @@ select option{background:var(--s2);}
 <header>
   <div class="logo">
     <div class="logo-box">🚑</div>
-    AMBULERT
+    AMBUWAYS
     <span style="font-family:'JetBrains Mono',monospace;font-size:.56rem;color:var(--muted);letter-spacing:1px;margin-left:4px;">DISPATCH v2</span>
   </div>
   <div class="hright">
@@ -139,6 +232,7 @@ select option{background:var(--s2);}
   </div>
 </header>
 
+<!-- DESKTOP LEFT -->
 <div id="left">
   <div id="tadmin">
     <div class="psec"><div class="plbl">Admin Panel</div><div class="ptitle">REGISTER UNIT</div></div>
@@ -147,13 +241,12 @@ select option{background:var(--s2);}
       <div class="fg"><label>Number Plate</label><input id="aplt" placeholder="JK01AB1234"></div>
       <div class="fg"><label>Unit ID</label><input id="aid" placeholder="AMB-007"></div>
       <div class="fg"><label>Contact</label><input id="aphn" placeholder="+91 9876543210"></div>
-      <div class="fg"><label>Hospital</label><input id="ahsp" placeholder="SMHS Hospital"></div>
+      <div class="fg s2"><label>Hospital / Base</label><input id="ahsp" placeholder="SMHS Hospital, Srinagar"></div>
     </div>
     <div style="padding:0 1.1rem .9rem"><button class="btn btnr" onclick="addUnit()">+ ADD UNIT TO FLEET</button></div>
     <div class="psec"><div class="plbl">Fleet</div><div class="ptitle">REGISTERED UNITS</div></div>
     <div class="amblist" id="amblist"><div class="empty">No units yet. Add one above.</div></div>
   </div>
-
   <div id="tdisp" style="display:none">
     <div class="psec"><div class="plbl">Dispatch</div><div class="ptitle">SEND ALERT</div></div>
     <div class="fgrid one">
@@ -162,9 +255,14 @@ select option{background:var(--s2);}
       </div>
       <div class="fg"><label>Alert Phone (recipient)</label><input id="dphn" placeholder="+91 9876543210" oninput="prevSMS()"></div>
       <div class="fg" style="position:relative">
-        <label>Destination</label>
-        <input id="ddest" placeholder="Search hospital, area..." autocomplete="off" oninput="searchLoc()" onkeydown="if(event.key==='Escape')closeDrop()">
-        <div id="locdrop" style="display:none;position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--s2);border:1px solid var(--b2);border-radius:9px;z-index:9999;max-height:190px;overflow-y:auto;box-shadow:0 10px 28px rgba(0,0,0,.6);"></div>
+        <label>Destination — type or pin on map ↓</label>
+        <input id="ddest" placeholder="Type mohalla, street, area..." autocomplete="off" oninput="searchKashmirLoc(this,'locdrop')" onkeydown="handleLocKey(event,'locdrop')" onfocus="if(this.value.length>=2)searchKashmirLoc(this,'locdrop')">
+        <div id="locdrop"></div>
+      </div>
+      <div class="fg">
+        <button class="btn btns" id="pinbtn" onclick="togglePinMode(false)" style="width:100%;padding:9px 11px;font-size:.72rem;display:flex;align-items:center;justify-content:center;gap:8px;border-radius:8px;">
+          <span id="pinicon">📍</span><span id="pintxt">TAP MAP TO SET DESTINATION</span>
+        </button>
       </div>
     </div>
     <div class="smsbox">
@@ -175,8 +273,13 @@ select option{background:var(--s2);}
   </div>
 </div>
 
+<!-- MAP -->
 <div id="mapwrap">
   <div id="map"></div>
+  <!-- Pin mode overlay banner -->
+  <div id="pinoverlay" style="display:none;position:absolute;top:12px;left:50%;transform:translateX(-50%);z-index:400;background:rgba(255,149,0,.95);color:#000;font-family:'JetBrains Mono',monospace;font-size:.72rem;letter-spacing:1px;padding:8px 18px;border-radius:100px;font-weight:700;pointer-events:none;white-space:nowrap;box-shadow:0 4px 20px rgba(0,0,0,.5);">
+    📍 TAP ANYWHERE ON MAP TO PIN DESTINATION
+  </div>
   <div id="simbar">
     <span>🚑</span>
     <span id="simlbl" style="color:var(--amber);font-size:.7rem">—</span>
@@ -186,6 +289,7 @@ select option{background:var(--s2);}
   </div>
 </div>
 
+<!-- DESKTOP RIGHT -->
 <div id="right">
   <div class="psec"><div class="plbl">Activity</div><div class="ptitle">LIVE LOG</div></div>
   <div class="stats">
@@ -194,20 +298,79 @@ select option{background:var(--s2);}
     <div class="stat"><div class="stn" id="stunits">0</div><div class="stl">Units</div></div>
   </div>
   <div class="loglist" id="loglist">
-    <div class="logitem">
-      <div class="lico lb">📡</div>
-      <div class="lbody"><div class="ltitle">System Online</div><div class="lsub">GPS &amp; alert system ready</div></div>
-      <div class="ltime">now</div>
+    <div class="logitem"><div class="lico lb">📡</div><div class="lbody"><div class="ltitle">System Online</div><div class="lsub">GPS &amp; alert system ready</div></div><div class="ltime">now</div></div>
+  </div>
+</div>
+
+<!-- MOBILE BOTTOM PANEL -->
+<div id="mobipanel">
+  <div id="mobitabs">
+    <button class="tab on" onclick="setMobiTab('admin')">ADMIN</button>
+    <button class="tab" onclick="setMobiTab('dispatch')">DISPATCH</button>
+    <button class="tab" onclick="setMobiTab('log')">LOG</button>
+  </div>
+  <div id="mobicontent">
+    <!-- admin -->
+    <div id="m-admin">
+      <div class="psec"><div class="plbl">Register</div><div class="ptitle">ADD UNIT</div></div>
+      <div class="fgrid">
+        <div class="fg s2"><label>Driver Name</label><input id="m-adrv" placeholder="Ravi Kumar"></div>
+        <div class="fg"><label>Plate</label><input id="m-aplt" placeholder="JK01AB1234"></div>
+        <div class="fg"><label>Unit ID</label><input id="m-aid" placeholder="AMB-007"></div>
+        <div class="fg s2"><label>Contact</label><input id="m-aphn" placeholder="+91 9876543210"></div>
+        <div class="fg s2"><label>Hospital</label><input id="m-ahsp" placeholder="SMHS Hospital"></div>
+      </div>
+      <div style="padding:0 .9rem .9rem"><button class="btn btnr" onclick="addUnitM()">+ ADD UNIT</button></div>
+      <div class="psec"><div class="plbl">Fleet</div><div class="ptitle">UNITS</div></div>
+      <div class="amblist" id="m-amblist"><div class="empty">No units yet.</div></div>
+    </div>
+    <!-- dispatch -->
+    <div id="m-dispatch" style="display:none">
+      <div class="psec"><div class="plbl">Dispatch</div><div class="ptitle">SEND ALERT</div></div>
+      <div class="fgrid one">
+        <div class="fg"><label>Select Unit</label>
+          <select id="m-dunit" onchange="prevSMSM()"><option value="">— Choose Ambulance —</option></select>
+        </div>
+        <div class="fg"><label>Alert Phone</label><input id="m-dphn" placeholder="+91 9876543210" oninput="prevSMSM()"></div>
+        <div class="fg" style="position:relative">
+          <label>Destination — type or pin ↓</label>
+          <input id="m-ddest" placeholder="Type mohalla, hospital, area..." autocomplete="off" oninput="searchKashmirLoc(this,'m-locdrop')" onkeydown="handleLocKey(event,'m-locdrop')" onfocus="if(this.value.length>=2)searchKashmirLoc(this,'m-locdrop')">
+          <div id="m-locdrop" style="display:none;position:absolute;top:calc(100% + 3px);left:0;right:0;background:var(--s2);border:1px solid var(--b2);border-radius:9px;z-index:9999;max-height:180px;overflow-y:auto;box-shadow:0 10px 28px rgba(0,0,0,.6);"></div>
+        </div>
+        <div class="fg">
+          <button class="btn btns" id="m-pinbtn" onclick="togglePinMode(true)" style="width:100%;padding:9px 11px;font-size:.72rem;display:flex;align-items:center;justify-content:center;gap:8px;border-radius:8px;">
+            <span id="m-pinicon">📍</span><span id="m-pintxt">TAP MAP TO SET DESTINATION</span>
+          </button>
+        </div>
+      </div>
+      <div class="smsbox">
+        <div class="smslbl">// SMS PREVIEW</div>
+        <div class="smstxt" id="m-smsprev" style="color:var(--m2)">Select a unit...</div>
+      </div>
+      <div style="padding:0 .9rem .9rem"><button class="btn btnr" onclick="openModalM()">🚨 DISPATCH &amp; SIMULATE</button></div>
+    </div>
+    <!-- log -->
+    <div id="m-log" style="display:none">
+      <div class="stats">
+        <div class="stat"><div class="stn" id="m-sttotal">0</div><div class="stl">Sent</div></div>
+        <div class="stat"><div class="stn" id="m-stact">0</div><div class="stl">En Route</div></div>
+        <div class="stat"><div class="stn" id="m-stunits">0</div><div class="stl">Units</div></div>
+      </div>
+      <div class="loglist" id="m-loglist">
+        <div class="logitem"><div class="lico lb">📡</div><div class="lbody"><div class="ltitle">System Online</div><div class="lsub">Ready</div></div><div class="ltime">now</div></div>
+      </div>
     </div>
   </div>
 </div>
-</div>
 
+</div><!-- #app -->
+
+<!-- MODAL -->
 <div id="modal">
   <div class="mbox">
     <div class="mtitle">CONFIRM <span>DISPATCH</span></div>
     <div class="mdet" id="mdet"></div>
-    <div style="font-size:.8rem;color:var(--muted)">Ambulance will simulate moving from your live GPS location to the destination on the map in real time.</div>
+    <div style="font-size:.8rem;color:var(--muted)">Ambulance will simulate moving from your GPS location to the destination in real time.</div>
     <div class="mfoot">
       <button class="btn btns" onclick="closeModal()" style="padding:10px 0;font-size:.85rem">CANCEL</button>
       <button class="btn btnr" onclick="confirmDispatch()">🚨 CONFIRM &amp; GO</button>
@@ -217,283 +380,815 @@ select option{background:var(--s2);}
 <div id="toast"></div>
 
 <script>
-let map, myMarker, myPos = null;
-let units = [], pending = null, totalSent = 0;
+// ═══════════════════════════════════════════════════════
+// KASHMIR LOCATIONS DATABASE
+// Covers: Srinagar mohallas, hospitals, streets, towns,
+// villages, districts of J&K
+// ═══════════════════════════════════════════════════════
+const KASHMIR_LOCATIONS = [
+  // ── HOSPITALS & MEDICAL ──
+  {n:"SMHS Hospital",c:"Srinagar",t:"hospital",lat:34.0797,lng:74.7991},
+  {n:"SKIMS Soura",c:"Soura, Srinagar",t:"hospital",lat:34.1023,lng:74.8089},
+  {n:"GB Pant Hospital",c:"Srinagar",t:"hospital",lat:34.0820,lng:74.7954},
+  {n:"Lal Ded Hospital",c:"Srinagar",t:"hospital",lat:34.0830,lng:74.7973},
+  {n:"Bone & Spine Hospital",c:"Barzulla, Srinagar",t:"hospital",lat:34.0935,lng:74.7910},
+  {n:"Chest Disease Hospital",c:"Dalgate, Srinagar",t:"hospital",lat:34.0720,lng:74.8260},
+  {n:"Shri Maharaja Hari Singh Hospital",c:"Jammu",t:"hospital",lat:32.7266,lng:74.8570},
+  {n:"Government Medical College Srinagar",c:"Karan Nagar, Srinagar",t:"hospital",lat:34.0851,lng:74.7965},
+  {n:"District Hospital Anantnag",c:"Anantnag",t:"hospital",lat:33.7310,lng:75.1479},
+  {n:"District Hospital Baramulla",c:"Baramulla",t:"hospital",lat:34.2030,lng:74.3420},
+  {n:"District Hospital Kupwara",c:"Kupwara",t:"hospital",lat:34.5250,lng:74.2570},
+  {n:"District Hospital Pulwama",c:"Pulwama",t:"hospital",lat:33.8746,lng:74.8979},
+  {n:"Sub District Hospital Sopore",c:"Sopore",t:"hospital",lat:34.3000,lng:74.4670},
+  {n:"PHC Ganderbal",c:"Ganderbal",t:"hospital",lat:34.2268,lng:74.7767},
+  {n:"PHC Budgam",c:"Budgam",t:"hospital",lat:33.9332,lng:74.7185},
+  {n:"PHC Kulgam",c:"Kulgam",t:"hospital",lat:33.6437,lng:75.0186},
+  {n:"Government Hospital Bandipore",c:"Bandipora",t:"hospital",lat:34.4139,lng:74.6513},
+  {n:"AIIMS Awantipora",c:"Awantipora",t:"hospital",lat:33.9142,lng:75.0063},
+  {n:"Sher-i-Kashmir Institute (SKIMS)",c:"Bemina, Srinagar",t:"hospital",lat:34.0802,lng:74.7579},
+  {n:"Central Jail Hospital",c:"Srinagar",t:"hospital",lat:34.0870,lng:74.8010},
 
-function initMap() {
-  map = L.map('map', { zoomControl: true, attributionControl: false });
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', {
-    maxZoom: 20,
-    subdomains: 'abcd'
-  }).addTo(map);
-  if (navigator.geolocation) {
-    navigator.geolocation.watchPosition(pos => {
-      myPos = [pos.coords.latitude, pos.coords.longitude];
-      if (!myMarker) {
-        map.setView(myPos, 15);
-        const el = document.createElement('div'); el.className = 'mydot';
-        myMarker = L.marker(myPos, { icon: L.divIcon({ className:'', html:el, iconSize:[14,14], iconAnchor:[7,7] }) })
-          .addTo(map).bindPopup('<b style="font-family:Bebas Neue,sans-serif;letter-spacing:1px">YOUR LOCATION</b>');
+  // ── SRINAGAR MOHALLAS & LOCALITIES ──
+  {n:"Lal Chowk",c:"Srinagar",t:"area",lat:34.0837,lng:74.7973},
+  {n:"Residency Road",c:"Srinagar",t:"road",lat:34.0800,lng:74.8025},
+  {n:"Maisuma",c:"Srinagar",t:"mohalla",lat:34.0870,lng:74.7985},
+  {n:"Nowhatta",c:"Srinagar",t:"mohalla",lat:34.0907,lng:74.8012},
+  {n:"Bohri Kadal",c:"Srinagar",t:"mohalla",lat:34.0915,lng:74.7986},
+  {n:"Safakadal",c:"Srinagar",t:"mohalla",lat:34.0935,lng:74.7965},
+  {n:"Rainawari",c:"Srinagar",t:"mohalla",lat:34.0975,lng:74.8050},
+  {n:"Karan Nagar",c:"Srinagar",t:"mohalla",lat:34.0868,lng:74.7970},
+  {n:"Raj Bagh",c:"Srinagar",t:"area",lat:34.0770,lng:74.8115},
+  {n:"Jawahar Nagar",c:"Srinagar",t:"area",lat:34.0795,lng:74.8120},
+  {n:"Shivpora",c:"Srinagar",t:"mohalla",lat:34.0751,lng:74.8255},
+  {n:"Dalgate",c:"Srinagar",t:"area",lat:34.0720,lng:74.8260},
+  {n:"Hazratbal",c:"Srinagar",t:"area",lat:34.1012,lng:74.8056},
+  {n:"Soura",c:"Srinagar",t:"area",lat:34.1023,lng:74.8089},
+  {n:"Batmaloo",c:"Srinagar",t:"area",lat:34.0850,lng:74.7910},
+  {n:"Bemina",c:"Srinagar",t:"area",lat:34.0802,lng:74.7579},
+  {n:"Barzulla",c:"Srinagar",t:"area",lat:34.0935,lng:74.7910},
+  {n:"Rangreth",c:"Srinagar",t:"area",lat:34.0617,lng:74.7654},
+  {n:"Pampore",c:"Pulwama",t:"town",lat:33.9928,lng:74.9393},
+  {n:"Pandach",c:"Ganderbal",t:"area",lat:34.2300,lng:74.7900},
+  {n:"Aloochi Bagh",c:"Srinagar",t:"mohalla",lat:34.0920,lng:74.8030},
+  {n:"Fateh Kadal",c:"Srinagar",t:"mohalla",lat:34.0925,lng:74.8000},
+  {n:"Zaina Kadal",c:"Srinagar",t:"mohalla",lat:34.0910,lng:74.7990},
+  {n:"Shali Kadal",c:"Srinagar",t:"mohalla",lat:34.0900,lng:74.7980},
+  {n:"Habba Kadal",c:"Srinagar",t:"mohalla",lat:34.0895,lng:74.7975},
+  {n:"Aali Kadal",c:"Srinagar",t:"mohalla",lat:34.0888,lng:74.7968},
+  {n:"Nawa Kadal",c:"Srinagar",t:"mohalla",lat:34.0882,lng:74.7961},
+  {n:"Sopore Kadal",c:"Srinagar",t:"mohalla",lat:34.0878,lng:74.7956},
+  {n:"Barbarshah",c:"Srinagar",t:"mohalla",lat:34.0930,lng:74.8005},
+  {n:"Nawab Bazar",c:"Srinagar",t:"area",lat:34.0890,lng:74.7970},
+  {n:"Khayam Chowk",c:"Srinagar",t:"area",lat:34.0845,lng:74.7980},
+  {n:"Polo View",c:"Srinagar",t:"area",lat:34.0820,lng:74.8030},
+  {n:"Boulevard Road",c:"Dal Lake, Srinagar",t:"road",lat:34.0950,lng:74.8220},
+  {n:"Zero Bridge",c:"Srinagar",t:"landmark",lat:34.0808,lng:74.8182},
+  {n:"Budshah Chowk",c:"Srinagar",t:"area",lat:34.0877,lng:74.7967},
+  {n:"Amirakadal",c:"Srinagar",t:"mohalla",lat:34.0865,lng:74.7960},
+  {n:"Rambagh",c:"Srinagar",t:"area",lat:34.0730,lng:74.8350},
+  {n:"Buchpora",c:"Srinagar",t:"area",lat:34.0690,lng:74.7990},
+  {n:"Indira Nagar",c:"Srinagar",t:"area",lat:34.0780,lng:74.7870},
+  {n:"Natipora",c:"Srinagar",t:"area",lat:34.0742,lng:74.7880},
+  {n:"Baghat Barzulla",c:"Srinagar",t:"area",lat:34.0960,lng:74.7920},
+  {n:"Wadpora",c:"Srinagar",t:"mohalla",lat:34.0940,lng:74.7945},
+  {n:"Zadibal",c:"Srinagar",t:"mohalla",lat:34.0950,lng:74.8010},
+  {n:"Khomeni Chowk",c:"Srinagar",t:"area",lat:34.0895,lng:74.7988},
+  {n:"Sadhu Gali",c:"Srinagar",t:"street",lat:34.0880,lng:74.7963},
+  {n:"Kathi Darwaza",c:"Srinagar",t:"mohalla",lat:34.0908,lng:74.7993},
+  {n:"Sheetal Nath",c:"Srinagar",t:"mohalla",lat:34.0920,lng:74.8040},
+  {n:"Nishat",c:"Srinagar",t:"area",lat:34.0870,lng:74.8520},
+  {n:"Shalimar",c:"Srinagar",t:"area",lat:34.1020,lng:74.8540},
+  {n:"Chashme Shahi",c:"Srinagar",t:"area",lat:34.0850,lng:74.8680},
+  {n:"Harwan",c:"Srinagar",t:"area",lat:34.1040,lng:74.8640},
+  {n:"Dachigam",c:"Srinagar",t:"area",lat:34.1260,lng:74.8990},
+  {n:"Ganpatyar",c:"Srinagar",t:"mohalla",lat:34.0860,lng:74.8005},
+  {n:"Sherghari",c:"Srinagar",t:"mohalla",lat:34.0848,lng:74.7995},
+  {n:"Makhdoom Sahib",c:"Srinagar",t:"landmark",lat:34.0948,lng:74.8042},
+  {n:"Hari Parbat",c:"Srinagar",t:"landmark",lat:34.0985,lng:74.8036},
+  {n:"Badami Bagh Cantonment",c:"Srinagar",t:"area",lat:34.0935,lng:74.8310},
+
+  // ── SRINAGAR STREETS & ROADS ──
+  {n:"MG Road",c:"Srinagar",t:"road",lat:34.0820,lng:74.7990},
+  {n:"Shervani Road",c:"Srinagar",t:"road",lat:34.0812,lng:74.8010},
+  {n:"Maulana Azad Road",c:"Srinagar",t:"road",lat:34.0855,lng:74.7978},
+  {n:"Hospital Road",c:"Srinagar",t:"road",lat:34.0810,lng:74.7988},
+  {n:"Abdullah Bridge Road",c:"Srinagar",t:"road",lat:34.0840,lng:74.8175},
+  {n:"Radio Kashmir Road",c:"Srinagar",t:"road",lat:34.0862,lng:74.8140},
+  {n:"Gupkar Road",c:"Srinagar",t:"road",lat:34.0884,lng:74.8300},
+  {n:"Bund Road",c:"Srinagar",t:"road",lat:34.0830,lng:74.8180},
+  {n:"Airport Road",c:"Srinagar",t:"road",lat:34.0540,lng:74.7780},
+  {n:"Bypass Road",c:"Srinagar",t:"road",lat:34.0620,lng:74.8050},
+  {n:"Ring Road",c:"Srinagar",t:"road",lat:34.0700,lng:74.7700},
+  {n:"National Highway 44",c:"Kashmir",t:"road",lat:34.1000,lng:74.8200},
+  {n:"Srinagar–Jammu National Highway",c:"Jammu & Kashmir",t:"road",lat:33.5000,lng:74.5000},
+  {n:"Srinagar–Leh Highway",c:"Jammu & Kashmir",t:"road",lat:34.2000,lng:75.5000},
+
+  // ── DISTRICTS & MAJOR TOWNS ──
+  {n:"Anantnag",c:"Anantnag District",t:"town",lat:33.7310,lng:75.1479},
+  {n:"Baramulla",c:"Baramulla District",t:"town",lat:34.2030,lng:74.3420},
+  {n:"Budgam",c:"Budgam District",t:"town",lat:33.9332,lng:74.7185},
+  {n:"Sopore",c:"Baramulla District",t:"town",lat:34.3000,lng:74.4670},
+  {n:"Pulwama",c:"Pulwama District",t:"town",lat:33.8746,lng:74.8979},
+  {n:"Shopian",c:"Shopian District",t:"town",lat:33.7155,lng:74.8319},
+  {n:"Kulgam",c:"Kulgam District",t:"town",lat:33.6437,lng:75.0186},
+  {n:"Ganderbal",c:"Ganderbal District",t:"town",lat:34.2268,lng:74.7767},
+  {n:"Bandipora",c:"Bandipora District",t:"town",lat:34.4139,lng:74.6513},
+  {n:"Kupwara",c:"Kupwara District",t:"town",lat:34.5250,lng:74.2570},
+  {n:"Handwara",c:"Kupwara District",t:"town",lat:34.3990,lng:74.2780},
+  {n:"Lolab",c:"Kupwara District",t:"village",lat:34.5500,lng:74.1900},
+  {n:"Uri",c:"Baramulla District",t:"town",lat:34.0850,lng:73.9080},
+  {n:"Tangmarg",c:"Baramulla District",t:"town",lat:34.0512,lng:74.4241},
+  {n:"Gulmarg",c:"Baramulla District",t:"area",lat:34.0487,lng:74.3836},
+  {n:"Pahalgam",c:"Anantnag District",t:"area",lat:34.0159,lng:75.3139},
+  {n:"Kokernag",c:"Anantnag District",t:"town",lat:33.5860,lng:75.2540},
+  {n:"Bijbehara",c:"Anantnag District",t:"town",lat:33.7956,lng:75.0985},
+  {n:"Dooru",c:"Anantnag District",t:"town",lat:33.6120,lng:75.2100},
+  {n:"Martand",c:"Anantnag District",t:"area",lat:33.7800,lng:75.1150},
+  {n:"Achabal",c:"Anantnag District",t:"area",lat:33.7280,lng:75.2100},
+  {n:"Verinag",c:"Anantnag District",t:"area",lat:33.5320,lng:75.2590},
+  {n:"Qazigund",c:"Anantnag District",t:"town",lat:33.5780,lng:75.1410},
+  {n:"Banihal",c:"Ramban District",t:"town",lat:33.5020,lng:75.2020},
+  {n:"Ramban",c:"Ramban District",t:"town",lat:33.2385,lng:75.2426},
+  {n:"Doru",c:"Anantnag District",t:"town",lat:33.6112,lng:75.2107},
+  {n:"Awantipora",c:"Pulwama District",t:"town",lat:33.9142,lng:75.0063},
+  {n:"Tral",c:"Pulwama District",t:"town",lat:33.8009,lng:75.1499},
+  {n:"Rajpora",c:"Pulwama District",t:"town",lat:33.8600,lng:74.8500},
+  {n:"Litter",c:"Pulwama District",t:"village",lat:33.9400,lng:74.9500},
+  {n:"Kakapora",c:"Pulwama District",t:"town",lat:33.9050,lng:74.9950},
+  {n:"Shadimarg",c:"Shopian District",t:"village",lat:33.7600,lng:74.8200},
+  {n:"Keller",c:"Shopian District",t:"village",lat:33.6800,lng:74.9200},
+  {n:"Zainpora",c:"Shopian District",t:"town",lat:33.6990,lng:74.8100},
+  {n:"Wachi",c:"Shopian District",t:"village",lat:33.7100,lng:74.9500},
+  {n:"Noorabad",c:"Kulgam District",t:"town",lat:33.6000,lng:75.0900},
+  {n:"D.H. Pora",c:"Kulgam District",t:"town",lat:33.5650,lng:75.0210},
+  {n:"Qaimoh",c:"Kulgam District",t:"town",lat:33.6500,lng:75.0800},
+  {n:"Homeshalibug",c:"Kulgam District",t:"village",lat:33.6580,lng:75.0500},
+  {n:"Devsar",c:"Kulgam District",t:"town",lat:33.6230,lng:75.0600},
+  {n:"Yaripora",c:"Kulgam District",t:"town",lat:33.6700,lng:75.0600},
+  {n:"Frisal",c:"Kulgam District",t:"village",lat:33.6900,lng:75.0300},
+  {n:"Pahalgam Lidder Valley",c:"Anantnag",t:"area",lat:34.0160,lng:75.3000},
+  {n:"Kokerbagh",c:"Anantnag",t:"village",lat:33.7450,lng:75.1600},
+  {n:"Seer Hamdan",c:"Anantnag District",t:"village",lat:33.7600,lng:75.1800},
+  {n:"Ari Pal",c:"Anantnag District",t:"village",lat:33.7700,lng:75.1950},
+
+  // ── BUDGAM VILLAGES & AREAS ──
+  {n:"Beerwah",c:"Budgam",t:"town",lat:34.0050,lng:74.6540},
+  {n:"Char-i-Sharief",c:"Budgam",t:"town",lat:33.8990,lng:74.6700},
+  {n:"Khansahib",c:"Budgam",t:"town",lat:34.0212,lng:74.6870},
+  {n:"Charar-e-Sharief",c:"Budgam",t:"town",lat:33.8992,lng:74.6735},
+  {n:"Narbal",c:"Budgam",t:"town",lat:34.0150,lng:74.7010},
+  {n:"Kralyar",c:"Budgam",t:"village",lat:34.0000,lng:74.7100},
+  {n:"Chadoora",c:"Budgam",t:"town",lat:33.9920,lng:74.8000},
+  {n:"Ompora",c:"Budgam",t:"area",lat:33.9700,lng:74.8300},
+  {n:"Palhalan",c:"Baramulla",t:"town",lat:34.2200,lng:74.6100},
+  {n:"Watergam",c:"Baramulla",t:"town",lat:34.2600,lng:74.4050},
+  {n:"Rafiabad",c:"Baramulla",t:"area",lat:34.3200,lng:74.3700},
+  {n:"Kanihama",c:"Budgam",t:"village",lat:34.0200,lng:74.6400},
+  {n:"Nasrullahpora",c:"Budgam",t:"village",lat:33.9500,lng:74.7000},
+  {n:"Magam",c:"Budgam",t:"town",lat:34.0520,lng:74.6310},
+  {n:"Ratsuna",c:"Budgam",t:"village",lat:34.0340,lng:74.6560},
+  {n:"Ichgam",c:"Budgam",t:"village",lat:34.0100,lng:74.7200},
+  {n:"Doderhama",c:"Budgam",t:"village",lat:34.0250,lng:74.6800},
+
+  // ── BARAMULLA AREA ──
+  {n:"Kreeri",c:"Baramulla",t:"town",lat:34.1500,lng:74.4900},
+  {n:"Rohama",c:"Baramulla",t:"village",lat:34.2780,lng:74.3990},
+  {n:"Kunzer",c:"Baramulla",t:"town",lat:34.1300,lng:74.4300},
+  {n:"Patten",c:"Baramulla",t:"village",lat:34.2300,lng:74.4000},
+  {n:"Pattan",c:"Baramulla",t:"town",lat:34.1980,lng:74.5010},
+  {n:"Mattan",c:"Baramulla",t:"town",lat:34.2100,lng:74.5500},
+  {n:"Sangrama",c:"Baramulla",t:"town",lat:34.2050,lng:74.5350},
+  {n:"Boniyar",c:"Baramulla",t:"town",lat:34.1500,lng:73.9400},
+  {n:"Kamalkote",c:"Baramulla",t:"area",lat:34.1700,lng:73.9100},
+  {n:"Gantamulla",c:"Baramulla",t:"village",lat:34.2250,lng:74.3650},
+  {n:"Sultanpora",c:"Baramulla",t:"village",lat:34.2050,lng:74.4100},
+  {n:"Kawarhama",c:"Baramulla",t:"village",lat:34.2600,lng:74.4700},
+  {n:"Dangiwacha",c:"Baramulla",t:"village",lat:34.3100,lng:74.4400},
+  {n:"Khoie",c:"Baramulla",t:"village",lat:34.1800,lng:74.4300},
+  {n:"Warpora",c:"Baramulla",t:"village",lat:34.2400,lng:74.3900},
+  {n:"Sheeri",c:"Baramulla",t:"village",lat:34.2800,lng:74.3500},
+  {n:"Maloosa",c:"Baramulla",t:"village",lat:34.2600,lng:74.5100},
+
+  // ── BANDIPORA AREA ──
+  {n:"Sumbal",c:"Bandipora",t:"town",lat:34.2800,lng:74.7480},
+  {n:"Gurez",c:"Bandipora",t:"area",lat:34.6200,lng:74.8300},
+  {n:"Hajin",c:"Bandipora",t:"town",lat:34.3070,lng:74.7280},
+  {n:"Ajas",c:"Bandipora",t:"village",lat:34.4100,lng:74.7200},
+  {n:"Tulail",c:"Bandipora",t:"area",lat:34.5900,lng:74.8100},
+  {n:"Sonawari",c:"Bandipora",t:"town",lat:34.3000,lng:74.6800},
+
+  // ── GANDERBAL AREA ──
+  {n:"Safapora",c:"Ganderbal",t:"town",lat:34.2050,lng:74.8350},
+  {n:"Lar",c:"Ganderbal",t:"town",lat:34.2850,lng:74.8700},
+  {n:"Kangan",c:"Ganderbal",t:"town",lat:34.2390,lng:75.1080},
+  {n:"Sonamarg",c:"Ganderbal",t:"area",lat:34.3050,lng:75.2930},
+  {n:"Wangath",c:"Ganderbal",t:"village",lat:34.2800,lng:75.2300},
+  {n:"Manigam",c:"Ganderbal",t:"village",lat:34.3500,lng:74.9500},
+  {n:"Nudpora",c:"Ganderbal",t:"village",lat:34.2150,lng:74.8100},
+  {n:"Gund",c:"Ganderbal",t:"town",lat:34.2660,lng:75.1450},
+
+  // ── KUPWARA AREA ──
+  {n:"Kupwara Chowk",c:"Kupwara",t:"area",lat:34.5260,lng:74.2600},
+  {n:"Karnah",c:"Kupwara",t:"area",lat:34.6900,lng:74.0600},
+  {n:"Sogam",c:"Kupwara",t:"village",lat:34.5700,lng:74.1800},
+  {n:"Drugmulla",c:"Kupwara",t:"village",lat:34.5400,lng:74.2100},
+  {n:"Kralpora",c:"Kupwara",t:"town",lat:34.4800,lng:74.3300},
+  {n:"Langate",c:"Kupwara",t:"town",lat:34.4200,lng:74.3100},
+  {n:"Trehgam",c:"Kupwara",t:"town",lat:34.4600,lng:74.2600},
+
+  // ── SRINAGAR SPECIFIC STREETS & LANES ──
+  {n:"Chinkipora",c:"Sopore, Baramulla",t:"area",lat:34.3050,lng:74.4780},
+  {n:"Nagbal",c:"Srinagar",t:"mohalla",lat:34.0906,lng:74.8018},
+  {n:"Bagh-e-Mehtab",c:"Srinagar",t:"area",lat:34.0820,lng:74.8400},
+  {n:"Shalimar Bagh",c:"Srinagar",t:"area",lat:34.1022,lng:74.8548},
+  {n:"Naseem Bagh",c:"Srinagar",t:"area",lat:34.1080,lng:74.8290},
+  {n:"Foreshore Road",c:"Dal Lake, Srinagar",t:"road",lat:34.0960,lng:74.8360},
+  {n:"Nehru Park",c:"Dal Lake, Srinagar",t:"landmark",lat:34.0895,lng:74.8460},
+  {n:"Shankaracharya Hill",c:"Srinagar",t:"landmark",lat:34.0882,lng:74.8372},
+  {n:"Pari Mahal",c:"Srinagar",t:"landmark",lat:34.0872,lng:74.8590},
+  {n:"Dal Lake",c:"Srinagar",t:"landmark",lat:34.0950,lng:74.8555},
+  {n:"Wular Lake",c:"Bandipora",t:"landmark",lat:34.3800,lng:74.5800},
+  {n:"Manasbal Lake",c:"Ganderbal",t:"landmark",lat:34.2210,lng:74.6740},
+  {n:"Anchar Lake",c:"Srinagar",t:"landmark",lat:34.1160,lng:74.8050},
+  {n:"Khushalsar",c:"Srinagar",t:"landmark",lat:34.0815,lng:74.8250},
+  {n:"Gilsar",c:"Srinagar",t:"landmark",lat:34.0820,lng:74.8220},
+  {n:"Tulip Garden",c:"Srinagar",t:"landmark",lat:34.0987,lng:74.8472},
+  {n:"TRC Chowk",c:"Srinagar",t:"area",lat:34.0826,lng:74.8050},
+  {n:"Pratap Park",c:"Srinagar",t:"area",lat:34.0835,lng:74.7985},
+  {n:"Ghanta Ghar",c:"Srinagar",t:"landmark",lat:34.0840,lng:74.7978},
+  {n:"Iqbal Park",c:"Srinagar",t:"area",lat:34.0840,lng:74.7968},
+  {n:"Ali Jan Road",c:"Srinagar",t:"road",lat:34.0840,lng:74.7990},
+  {n:"Kashmir University Campus",c:"Srinagar",t:"area",lat:34.1030,lng:74.8015},
+  {n:"NIT Srinagar",c:"Hazratbal",t:"area",lat:34.1005,lng:74.8050},
+  {n:"Central University Kashmir",c:"Ganderbal",t:"area",lat:34.2268,lng:74.7767},
+  {n:"Amar Singh College",c:"Srinagar",t:"area",lat:34.0820,lng:74.8125},
+  {n:"SP College",c:"Srinagar",t:"area",lat:34.0800,lng:74.7980},
+  {n:"Islamia College of Science & Commerce",c:"Srinagar",t:"area",lat:34.0795,lng:74.7960},
+  {n:"DIET Ganderbal",c:"Ganderbal",t:"area",lat:34.2280,lng:74.7790},
+  {n:"Srinagar Airport",c:"Srinagar",t:"airport",lat:34.0057,lng:74.7742},
+
+  // ── JAMMU CITY ──
+  {n:"Jammu",c:"Jammu District",t:"city",lat:32.7266,lng:74.8570},
+  {n:"Tawi River",c:"Jammu",t:"landmark",lat:32.7300,lng:74.8580},
+  {n:"Gandhi Nagar",c:"Jammu",t:"area",lat:32.7200,lng:74.8650},
+  {n:"Bakshi Nagar",c:"Jammu",t:"area",lat:32.7150,lng:74.8700},
+  {n:"Talab Tillo",c:"Jammu",t:"area",lat:32.7400,lng:74.8530},
+  {n:"Sarwal",c:"Jammu",t:"area",lat:32.7450,lng:74.8400},
+  {n:"Channi Himmat",c:"Jammu",t:"area",lat:32.6900,lng:74.8600},
+  {n:"Bhagwati Nagar",c:"Jammu",t:"area",lat:32.7100,lng:74.8750},
+
+  // ── ADDITIONAL KASHMIR VILLAGES ──
+  {n:"Wuyan",c:"Pulwama",t:"village",lat:33.9450,lng:74.9800},
+  {n:"Khrew",c:"Pulwama",t:"town",lat:33.9450,lng:74.9550},
+  {n:"Arihal",c:"Pulwama",t:"village",lat:33.8200,lng:74.8700},
+  {n:"Prichoo",c:"Pulwama",t:"village",lat:33.8700,lng:74.8200},
+  {n:"Newa",c:"Pulwama",t:"village",lat:33.8950,lng:74.8100},
+  {n:"Drabgam",c:"Pulwama",t:"village",lat:33.9100,lng:74.8950},
+  {n:"Tahab",c:"Pulwama",t:"village",lat:33.9000,lng:74.9300},
+  {n:"Shar-i-Khas",c:"Srinagar",t:"mohalla",lat:34.0900,lng:74.7988},
+  {n:"Tengpora",c:"Srinagar",t:"area",lat:34.0740,lng:74.8010},
+  {n:"Sanat Nagar",c:"Srinagar",t:"area",lat:34.0780,lng:74.7910},
+  {n:"Habbakadal",c:"Srinagar",t:"mohalla",lat:34.0894,lng:74.7975},
+  {n:"Kawdara",c:"Srinagar",t:"mohalla",lat:34.0888,lng:74.7958},
+  {n:"Khankah Faiz Panah",c:"Srinagar",t:"mohalla",lat:34.0900,lng:74.7950},
+  {n:"Makhdoom Sahib Dargah",c:"Srinagar",t:"landmark",lat:34.0948,lng:74.8042},
+  {n:"Khiram",c:"Anantnag",t:"village",lat:33.7690,lng:75.1980},
+  {n:"Sangam",c:"Anantnag",t:"area",lat:33.9500,lng:74.9800},
+  {n:"Mattan Anantnag",c:"Anantnag",t:"town",lat:33.8200,lng:75.1350},
+  {n:"Aishmuqam",c:"Anantnag",t:"area",lat:34.0100,lng:75.3100},
+  {n:"Chandanwari",c:"Anantnag",t:"area",lat:34.1100,lng:75.4500},
+  {n:"Gangabal",c:"Ganderbal",t:"area",lat:34.2700,lng:75.0300},
+  {n:"Tulail Valley",c:"Bandipora",t:"area",lat:34.5800,lng:74.8000},
+  {n:"Naranag",c:"Ganderbal",t:"area",lat:34.2620,lng:75.0080},
+  {n:"Yusmarg",c:"Budgam",t:"area",lat:33.8270,lng:74.6570},
+  {n:"Doodhpathri",c:"Budgam",t:"area",lat:33.8490,lng:74.5340},
+  {n:"Tosamaidan",c:"Budgam",t:"area",lat:33.9100,lng:74.5500},
+  {n:"Kounsarnag",c:"Kulgam",t:"area",lat:33.5900,lng:75.0800},
+  {n:"Bangus Valley",c:"Kupwara",t:"area",lat:34.5700,lng:74.2900},
+  {n:"Lolab Valley",c:"Kupwara",t:"area",lat:34.5500,lng:74.1900},
+  {n:"Baderwah",c:"Doda District",t:"town",lat:33.1367,lng:75.7291},
+  {n:"Doda",c:"Doda District",t:"town",lat:33.1500,lng:75.5500},
+  {n:"Kishtwar",c:"Kishtwar District",t:"town",lat:33.3135,lng:75.7627},
+  {n:"Reasi",c:"Reasi District",t:"town",lat:33.0830,lng:74.8350},
+  {n:"Udhampur",c:"Udhampur District",t:"town",lat:32.9192,lng:75.1411},
+  {n:"Kathua",c:"Kathua District",t:"town",lat:32.3871,lng:75.5127},
+  {n:"Samba",c:"Samba District",t:"town",lat:32.5729,lng:75.1193},
+  {n:"Poonch",c:"Poonch District",t:"town",lat:33.7740,lng:74.0927},
+  {n:"Rajouri",c:"Rajouri District",t:"town",lat:33.3787,lng:74.3098},
+  {n:"Nowshera",c:"Rajouri",t:"town",lat:33.4300,lng:74.2300},
+  {n:"Sunderbani",c:"Rajouri",t:"town",lat:33.2960,lng:74.3880},
+  {n:"Kalakote",c:"Rajouri",t:"town",lat:33.4050,lng:74.4630},
+  {n:"Thannamandi",c:"Rajouri",t:"town",lat:33.6430,lng:74.2790},
+  {n:"Mendhar",c:"Poonch",t:"town",lat:33.6570,lng:73.9090},
+  {n:"Surankote",c:"Poonch",t:"town",lat:33.7070,lng:74.1590},
+
+  // ── TRAL — FULL MOHALLA & STREET DATABASE ──
+  {n:"Tral",c:"Pulwama District",t:"town",lat:33.8009,lng:75.1499},
+  {n:"Tral Town",c:"Tral, Pulwama",t:"area",lat:33.8009,lng:75.1499},
+  {n:"Tral Chowk",c:"Tral, Pulwama",t:"area",lat:33.8012,lng:75.1502},
+  {n:"Kadi Masjid",c:"Tral, Pulwama",t:"mosque",lat:33.8018,lng:75.1508},
+  {n:"Kadi Masjid Road",c:"Tral, Pulwama",t:"road",lat:33.8016,lng:75.1506},
+  {n:"Kar Mohalla",c:"Tral, Pulwama",t:"mohalla",lat:33.8022,lng:75.1495},
+  {n:"Kar Mohalla Main Street",c:"Tral, Pulwama",t:"road",lat:33.8020,lng:75.1493},
+  {n:"Khankah Mohalla",c:"Tral, Pulwama",t:"mohalla",lat:33.8030,lng:75.1510},
+  {n:"Khankah Sahib Tral",c:"Tral, Pulwama",t:"landmark",lat:33.8032,lng:75.1512},
+  {n:"Behak Mohalla",c:"Tral, Pulwama",t:"mohalla",lat:33.8005,lng:75.1488},
+  {n:"Bazar Mohalla Tral",c:"Tral, Pulwama",t:"mohalla",lat:33.8014,lng:75.1500},
+  {n:"Main Bazar Tral",c:"Tral, Pulwama",t:"road",lat:33.8013,lng:75.1501},
+  {n:"Tral Main Road",c:"Tral, Pulwama",t:"road",lat:33.8010,lng:75.1495},
+  {n:"Palpora Mohalla",c:"Tral, Pulwama",t:"mohalla",lat:33.8040,lng:75.1520},
+  {n:"Nai Basti Tral",c:"Tral, Pulwama",t:"mohalla",lat:33.8000,lng:75.1480},
+  {n:"Gundipora",c:"Tral, Pulwama",t:"village",lat:33.7990,lng:75.1470},
+  {n:"Noorpora",c:"Tral, Pulwama",t:"village",lat:33.8050,lng:75.1550},
+  {n:"Kakapora Tral",c:"Tral, Pulwama",t:"area",lat:33.7980,lng:75.1460},
+  {n:"Dair",c:"Tral, Pulwama",t:"village",lat:33.8100,lng:75.1600},
+  {n:"Nowpora Tral",c:"Tral, Pulwama",t:"village",lat:33.8070,lng:75.1570},
+  {n:"Mandoora",c:"Tral, Pulwama",t:"village",lat:33.7950,lng:75.1400},
+  {n:"Naira",c:"Tral, Pulwama",t:"village",lat:33.8150,lng:75.1650},
+  {n:"Batagund",c:"Tral, Pulwama",t:"village",lat:33.8200,lng:75.1700},
+  {n:"Chatpora",c:"Tral, Pulwama",t:"village",lat:33.7900,lng:75.1350},
+  {n:"Drubgam Tral",c:"Tral, Pulwama",t:"village",lat:33.7860,lng:75.1300},
+  {n:"Sopat",c:"Tral, Pulwama",t:"village",lat:33.8250,lng:75.1750},
+  {n:"Fersipora",c:"Tral, Pulwama",t:"village",lat:33.7920,lng:75.1380},
+  {n:"Goripora",c:"Tral, Pulwama",t:"village",lat:33.8080,lng:75.1580},
+  {n:"Haran Tral",c:"Tral, Pulwama",t:"area",lat:33.8030,lng:75.1540},
+  {n:"PHC Tral",c:"Tral, Pulwama",t:"hospital",lat:33.8008,lng:75.1496},
+  {n:"Government Higher Secondary School Tral",c:"Tral, Pulwama",t:"area",lat:33.8015,lng:75.1503},
+  {n:"Tral Police Station",c:"Tral, Pulwama",t:"landmark",lat:33.8011,lng:75.1498},
+  {n:"Tral Forest Road",c:"Tral, Pulwama",t:"road",lat:33.8060,lng:75.1560},
+  {n:"Shopian Road Tral",c:"Tral, Pulwama",t:"road",lat:33.7930,lng:75.1420},
+  {n:"Shikargah Tral",c:"Tral, Pulwama",t:"area",lat:33.8300,lng:75.1800},
+  {n:"Nagberan",c:"Tral, Pulwama",t:"village",lat:33.8350,lng:75.1850},
+  {n:"Hapatnar",c:"Tral, Pulwama",t:"village",lat:33.8120,lng:75.1620},
+  {n:"Trenz",c:"Tral, Pulwama",t:"village",lat:33.8180,lng:75.1680},
+  {n:"Reban",c:"Tral, Pulwama",t:"village",lat:33.8220,lng:75.1720},
+  {n:"Rajpora Tral",c:"Tral, Pulwama",t:"area",lat:33.7970,lng:75.1450},
+  {n:"Lajoora",c:"Tral, Pulwama",t:"village",lat:33.7940,lng:75.1410},
+  {n:"Khanpora Tral",c:"Tral, Pulwama",t:"mohalla",lat:33.8025,lng:75.1505},
+  {n:"Shah Mohalla Tral",c:"Tral, Pulwama",t:"mohalla",lat:33.8028,lng:75.1498},
+  {n:"Darpora Tral",c:"Tral, Pulwama",t:"mohalla",lat:33.8035,lng:75.1515},
+  {n:"Watal Mohalla Tral",c:"Tral, Pulwama",t:"mohalla",lat:33.8019,lng:75.1492},
+  {n:"Lone Mohalla Tral",c:"Tral, Pulwama",t:"mohalla",lat:33.8023,lng:75.1497},
+  {n:"Mir Mohalla Tral",c:"Tral, Pulwama",t:"mohalla",lat:33.8026,lng:75.1503},
+  {n:"Bhat Mohalla Tral",c:"Tral, Pulwama",t:"mohalla",lat:33.8021,lng:75.1507},
+  {n:"Ganie Mohalla Tral",c:"Tral, Pulwama",t:"mohalla",lat:33.8017,lng:75.1511},
+  {n:"Dar Mohalla Tral",c:"Tral, Pulwama",t:"mohalla",lat:33.8033,lng:75.1493},
+  {n:"Wani Mohalla Tral",c:"Tral, Pulwama",t:"mohalla",lat:33.8015,lng:75.1485},
+  {n:"Ahangar Mohalla Tral",c:"Tral, Pulwama",t:"mohalla",lat:33.8037,lng:75.1519},
+  {n:"Masjid Road Tral",c:"Tral, Pulwama",t:"road",lat:33.8014,lng:75.1504},
+  {n:"Jama Masjid Tral",c:"Tral, Pulwama",t:"mosque",lat:33.8015,lng:75.1500},
+  {n:"Idgah Tral",c:"Tral, Pulwama",t:"landmark",lat:33.8007,lng:75.1490},
+  {n:"Tral Graveyard Road",c:"Tral, Pulwama",t:"road",lat:33.8009,lng:75.1488},
+  {n:"New Colony Tral",c:"Tral, Pulwama",t:"area",lat:33.8004,lng:75.1476},
+  {n:"Old Town Tral",c:"Tral, Pulwama",t:"area",lat:33.8018,lng:75.1505},
+];
+
+// ═══════════════════════════════════════════════════════
+// CORE APP STATE
+// ═══════════════════════════════════════════════════════
+let map, myMarker, myPos=null;
+let units=[], pending=null, totalSent=0;
+let destLatLng=null, destLatLngM=null;
+let isMobile=false;
+
+function checkMobile(){ return window.innerWidth<=600; }
+
+let pinModeActive=false, pinModeForMobile=false;
+
+function togglePinMode(isMobile){
+  setPinMode(!pinModeActive, isMobile);
+}
+
+function setPinMode(on, isMobile){
+  pinModeActive=on; pinModeForMobile=isMobile;
+  // overlay banner
+  document.getElementById('pinoverlay').style.display=on?'block':'none';
+  // cursor
+  document.getElementById('map').style.cursor=on?'crosshair':'';
+  // button state — desktop
+  const btn=document.getElementById('pinbtn');
+  const btnM=document.getElementById('m-pinbtn');
+  if(btn){
+    btn.style.borderColor=on?'var(--amber)':'var(--b2)';
+    btn.style.color=on?'var(--amber)':'var(--text)';
+    document.getElementById('pinicon').textContent=on?'🎯':'📍';
+    document.getElementById('pintxt').textContent=on?'PINNING… TAP MAP':'TAP MAP TO SET DESTINATION';
+  }
+  if(btnM){
+    btnM.style.borderColor=on?'var(--amber)':'var(--b2)';
+    btnM.style.color=on?'var(--amber)':'var(--text)';
+    document.getElementById('m-pinicon').textContent=on?'🎯':'📍';
+    document.getElementById('m-pintxt').textContent=on?'PINNING… TAP MAP':'TAP MAP TO SET DESTINATION';
+  }
+  if(on) toast('🎯 Tap anywhere on the map to pin destination', false);
+}
+
+function initMap(){
+  map=L.map('map',{zoomControl:true,attributionControl:false});
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:20,subdomains:'abcd'}).addTo(map);
+
+  // Map click → pin destination when pin mode active
+  map.on('click', function(e){
+    if(!pinModeActive) return;
+    const lat=e.latlng.lat, lng=e.latlng.lng;
+    const label=`Pinned Location (${lat.toFixed(4)}, ${lng.toFixed(4)})`;
+    // set for whichever context triggered pin mode
+    if(pinModeForMobile){
+      destLatLngM=[lat,lng];
+      document.getElementById('m-ddest').value=label;
+      prevSMSM();
+    } else {
+      destLatLng=[lat,lng];
+      document.getElementById('ddest').value=label;
+      prevSMS();
+    }
+    // drop preview marker
+    if(window._pinPreview) map.removeLayer(window._pinPreview);
+    const pe=document.createElement('div'); pe.className='destdot'; pe.innerHTML='<div class="destin">📍</div>';
+    window._pinPreview=L.marker([lat,lng],{
+      icon:L.divIcon({className:'',html:pe,iconSize:[26,26],iconAnchor:[13,26]})
+    }).addTo(map).bindPopup(`<b>PINNED DESTINATION</b><br>${lat.toFixed(5)}, ${lng.toFixed(5)}`).openPopup();
+    // exit pin mode
+    setPinMode(false, pinModeForMobile);
+    toast('📍 Destination pinned!');
+  });
+
+  if(navigator.geolocation){
+    navigator.geolocation.watchPosition(pos=>{
+      myPos=[pos.coords.latitude,pos.coords.longitude];
+      if(!myMarker){
+        map.setView(myPos,14);
+        const el=document.createElement('div'); el.className='mydot';
+        myMarker=L.marker(myPos,{icon:L.divIcon({className:'',html:el,iconSize:[14,14],iconAnchor:[7,7]})})
+          .addTo(map).bindPopup('<b style="font-family:Bebas Neue,sans-serif">YOUR LOCATION</b>');
         toast('📍 Live GPS acquired');
-        addLog('📍','lb','GPS Acquired','Your live location is active on map');
+        addLog('📍','lb','GPS Acquired','Live location active');
       } else { myMarker.setLatLng(myPos); }
-    }, () => {
-      myPos = [34.0837, 74.7973];
-      map.setView(myPos, 14);
-      const el = document.createElement('div'); el.className = 'mydot';
-      myMarker = L.marker(myPos, { icon: L.divIcon({ className:'', html:el, iconSize:[14,14], iconAnchor:[7,7] }) })
-        .addTo(map).bindPopup('<b>BASE LOCATION — Srinagar (fallback)</b>');
-      addLog('📍','la','GPS Fallback','Using Srinagar as default location');
-    }, { enableHighAccuracy: true, maximumAge: 4000 });
+    },()=>{
+      myPos=[34.0837,74.7973];
+      map.setView(myPos,14);
+      const el=document.createElement('div'); el.className='mydot';
+      myMarker=L.marker(myPos,{icon:L.divIcon({className:'',html:el,iconSize:[14,14],iconAnchor:[7,7]})})
+        .addTo(map).bindPopup('<b>BASE — Lal Chowk, Srinagar (fallback)</b>');
+      addLog('📍','la','GPS Fallback','Using Srinagar as default');
+    },{enableHighAccuracy:true,maximumAge:4000});
   }
 }
 
-function setTab(t) {
-  document.querySelectorAll('.tab').forEach(p => p.classList.toggle('on', p.textContent.toLowerCase() === t));
-  document.getElementById('tadmin').style.display = t==='admin' ? '' : 'none';
-  document.getElementById('tdisp').style.display  = t==='dispatch' ? '' : 'none';
+// ── TABS (desktop) ──
+function setTab(t){
+  document.querySelectorAll('#app > div:first-child ~ * .tab, header .tab').forEach(p=>{
+    if(p.textContent.toLowerCase()===t||p.getAttribute('onclick')==="setTab('"+t+"')")p.classList.add('on');
+    else p.classList.remove('on');
+  });
+  document.querySelectorAll('header .tab').forEach(p=>p.classList.toggle('on',p.textContent.toLowerCase()===t));
+  document.getElementById('tadmin').style.display=t==='admin'?'':'none';
+  document.getElementById('tdisp').style.display=t==='dispatch'?'':'none';
 }
 
-function addUnit() {
+// ── TABS (mobile) ──
+function setMobiTab(t){
+  document.querySelectorAll('#mobitabs .tab').forEach(p=>p.classList.toggle('on',p.getAttribute('onclick')==="setMobiTab('"+t+"')"));
+  document.getElementById('m-admin').style.display=t==='admin'?'':'none';
+  document.getElementById('m-dispatch').style.display=t==='dispatch'?'':'none';
+  document.getElementById('m-log').style.display=t==='log'?'':'none';
+}
+
+// ── ADD UNIT (desktop) ──
+function addUnit(){
   const driver=document.getElementById('adrv').value.trim(), plate=document.getElementById('aplt').value.trim();
   const id=document.getElementById('aid').value.trim()||'AMB-'+String(units.length+1).padStart(3,'0');
   const phone=document.getElementById('aphn').value.trim(), hospital=document.getElementById('ahsp').value.trim();
-  if (!driver||!plate) { toast('⚠️ Driver name & plate required',true); return; }
-  units.push({ id, driver, plate, phone, hospital, status:'standby', marker:null, destMarker:null, line:null });
-  const opt=document.createElement('option'); opt.value=units.length-1; opt.textContent=`${id} — ${plate}`;
+  if(!driver||!plate){toast('⚠️ Driver name & plate required',true);return;}
+  _addUnit({driver,plate,id,phone,hospital});
+  ['adrv','aplt','aid','aphn','ahsp'].forEach(x=>document.getElementById(x).value='');
+}
+
+// ── ADD UNIT (mobile) ──
+function addUnitM(){
+  const driver=document.getElementById('m-adrv').value.trim(), plate=document.getElementById('m-aplt').value.trim();
+  const id=document.getElementById('m-aid').value.trim()||'AMB-'+String(units.length+1).padStart(3,'0');
+  const phone=document.getElementById('m-aphn').value.trim(), hospital=document.getElementById('m-ahsp').value.trim();
+  if(!driver||!plate){toast('⚠️ Driver & plate required',true);return;}
+  _addUnit({driver,plate,id,phone,hospital});
+  ['m-adrv','m-aplt','m-aid','m-aphn','m-ahsp'].forEach(x=>document.getElementById(x).value='');
+}
+
+function _addUnit({driver,plate,id,phone,hospital}){
+  units.push({id,driver,plate,phone,hospital,status:'standby',marker:null,destMarker:null,line:null});
+  // desktop select
+  let opt=document.createElement('option'); opt.value=units.length-1; opt.textContent=`${id} — ${plate}`;
   document.getElementById('dunit').appendChild(opt);
-  renderUnits();
-  document.getElementById('stunits').textContent = units.length;
-  ['adrv','aplt','aid','aphn','ahsp'].forEach(x => document.getElementById(x).value='');
+  // mobile select
+  let optM=document.createElement('option'); optM.value=units.length-1; optM.textContent=`${id} — ${plate}`;
+  document.getElementById('m-dunit').appendChild(optM);
+  renderUnits(); renderUnitsM();
+  updStats();
   addLog('🚑','lr',id+' Registered',driver+' · '+plate);
   toast('✅ '+id+' added to fleet');
 }
 
-function renderUnits() {
-  const list = document.getElementById('amblist');
-  if (!units.length) { list.innerHTML='<div class="empty">No units yet.</div>'; return; }
-  list.innerHTML='';
-  units.forEach((u,i) => {
-    const cls  = u.status==='enroute'?'ce':u.status==='arrived'?'ca':'';
-    const scls = u.status==='standby'?'ss':u.status==='enroute'?'se':'sv';
-    const acts = u.status==='standby'
-      ? `<button class="btn btns" onclick="quickDispatch(${i})">🚨 DISPATCH</button><button class="btn btns" onclick="locUnit(${i})">📍 MAP</button>`
-      : u.status==='enroute'
-      ? `<button class="btn btns" style="color:var(--amber);border-color:var(--amber)">⏳ EN ROUTE</button><button class="btn btns" onclick="locUnit(${i})">📍 MAP</button>`
-      : `<button class="btn btns" style="color:var(--green);border-color:var(--green)" onclick="resetUnit(${i})">✅ RESET</button>`;
-    const d = document.createElement('div');
-    d.className='acard '+cls;
-    d.innerHTML=`<div class="atop"><div class="aplate">${u.plate}</div><div class="astatus ${scls}">${u.status}</div></div><div class="ainfo">${u.id} · ${u.driver}${u.hospital?' · '+u.hospital:''}</div><div class="aacts">${acts}</div>`;
-    list.appendChild(d);
-  });
+function renderUnits(){
+  const list=document.getElementById('amblist');
+  if(!units.length){list.innerHTML='<div class="empty">No units yet.</div>';return;}
+  list.innerHTML=''; units.forEach((u,i)=>list.appendChild(unitCard(u,i,false)));
+}
+function renderUnitsM(){
+  const list=document.getElementById('m-amblist');
+  if(!units.length){list.innerHTML='<div class="empty">No units yet.</div>';return;}
+  list.innerHTML=''; units.forEach((u,i)=>list.appendChild(unitCard(u,i,true)));
 }
 
-function locUnit(i) {
+function openGoogleMaps(destLat, destLng, label){
+  // Opens Google Maps directions from current location to destination
+  const origin = myPos ? `${myPos[0]},${myPos[1]}` : 'Srinagar,Kashmir';
+  const dest = `${destLat},${destLng}`;
+  const url = `https://www.google.com/maps/dir/?api=1&origin=${origin}&destination=${dest}&travelmode=driving`;
+  window.open(url, '_blank');
+}
+
+function openGoogleMapsSearch(query){
+  const url = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(query+', Kashmir')}`;
+  window.open(url, '_blank');
+}
+
+const GMAPS_ICON = `<svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/></svg>`;
+
+function unitCard(u,i,mobile){
+  const cls=u.status==='enroute'?'ce':u.status==='arrived'?'ca':'';
+  const scls=u.status==='standby'?'ss':u.status==='enroute'?'se':'sv';
+  const qd=mobile?`quickDispatchM(${i})`:`quickDispatch(${i})`;
+
+  let destLat = u.destCoords ? u.destCoords[0] : null;
+  let destLng = u.destCoords ? u.destCoords[1] : null;
+  const gmapsNav = destLat ? `<button class="btn btng" onclick="openGoogleMaps(${destLat},${destLng},'${(u.destLabel||'').replace(/'/g,"\\'")}' )" title="Navigate in Google Maps">${GMAPS_ICON}NAVIGATE</button>` : '';
+  const gmapsSearch = u.hospital ? `<button class="btn btng" onclick="openGoogleMapsSearch('${u.hospital.replace(/'/g,"\\'")}' )" title="Find on Google Maps">${GMAPS_ICON}HOSPITAL</button>` : '';
+
+  const acts=u.status==='standby'
+    ?`<button class="btn btns" onclick="${qd}">🚨 DISPATCH</button><button class="btn btns" onclick="locUnit(${i})">📍 MAP</button>${gmapsSearch}`
+    :u.status==='enroute'
+    ?`<button class="btn btns" style="color:var(--amber);border-color:var(--amber)">⏳ EN ROUTE</button><button class="btn btns" onclick="locUnit(${i})">📍 MAP</button>${gmapsNav}`
+    :`<button class="btn btns" style="color:var(--green);border-color:var(--green)" onclick="resetUnit(${i})">✅ RESET</button>${gmapsNav}`;
+  const d=document.createElement('div'); d.className='acard '+cls;
+  d.innerHTML=`<div class="atop"><div class="aplate">${u.plate}</div><div class="astatus ${scls}">${u.status}</div></div><div class="ainfo">${u.id} · ${u.driver}${u.hospital?' · '+u.hospital:''}</div><div class="aacts">${acts}</div>`;
+  return d;
+}
+
+function locUnit(i){
   const u=units[i];
-  if (u.marker) map.flyTo(u.marker.getLatLng(),16,{duration:1});
-  else if (myPos) map.flyTo(myPos,15,{duration:1});
+  if(u.marker)map.flyTo(u.marker.getLatLng(),16,{duration:1});
+  else if(myPos)map.flyTo(myPos,15,{duration:1});
 }
 
-function quickDispatch(i) {
-  document.getElementById('dunit').value=i;
-  prevSMS(); setTab('dispatch');
-}
+function quickDispatch(i){document.getElementById('dunit').value=i;prevSMS();setTab('dispatch');}
+function quickDispatchM(i){document.getElementById('m-dunit').value=i;prevSMSM();setMobiTab('dispatch');}
 
-function prevSMS() {
+// ── SMS PREVIEW ──
+function prevSMS(){
   const idx=document.getElementById('dunit').value;
   const dest=document.getElementById('ddest').value||'Destination';
-  if (idx==='') { document.getElementById('smsprev').textContent='Select a unit to preview...'; return; }
+  if(idx===''){document.getElementById('smsprev').textContent='Select a unit to preview...';return;}
   const u=units[idx];
   document.getElementById('smsprev').innerHTML=`🚨 <span class="hi">AMBULANCE ALERT</span><br>Unit: <span class="pl">${u.id}</span><br>Plate: <span class="pl">${u.plate}</span><br>Driver: <span class="hi">${u.driver}</span><br>Heading to: ${dest}<br><br>⚠️ Please clear the road.<br><span style="color:var(--m2)">— AmbulERT System</span>`;
 }
+function prevSMSM(){
+  const idx=document.getElementById('m-dunit').value;
+  const dest=document.getElementById('m-ddest').value||'Destination';
+  if(idx===''){document.getElementById('m-smsprev').textContent='Select a unit...';return;}
+  const u=units[idx];
+  document.getElementById('m-smsprev').innerHTML=`🚨 <span class="hi">ALERT</span><br>Unit: <span class="pl">${u.id}</span><br>Plate: <span class="pl">${u.plate}</span><br>To: ${dest}<br>⚠️ Clear the road.<br><span style="color:var(--m2)">— AmbulERT</span>`;
+}
 
-function openModal() {
+// ── MODAL ──
+function openModal(){
   const idx=document.getElementById('dunit').value;
   const dest=document.getElementById('ddest').value.trim();
   const phone=document.getElementById('dphn').value.trim();
-  if (idx==='') { toast('⚠️ Select a unit first',true); return; }
-  if (!dest)    { toast('⚠️ Enter a destination',true); return; }
-  if (!destLatLng) { toast('⚠️ Pick a location from the dropdown',true); return; }
-  const u=units[idx]; pending={idx:+idx,dest,phone,coords:destLatLng};
-  document.getElementById('mdet').innerHTML=`Unit: <span style="color:var(--red)">${u.id}</span><br>Driver: ${u.driver}<br>Plate: <span style="color:var(--amber)">${u.plate}</span><br>Destination: ${dest}<br>Coords: ${destLatLng[0].toFixed(4)}, ${destLatLng[1].toFixed(4)}<br>Alert to: ${phone||'No SMS (demo)'}`;
+  if(idx===''){toast('⚠️ Select a unit first',true);return;}
+  if(!dest){toast('⚠️ Enter a destination',true);return;}
+  if(!destLatLng){toast('⚠️ Pick from dropdown',true);return;}
+  const u=units[idx]; pending={idx:+idx,dest,phone,coords:destLatLng,mobile:false};
+  document.getElementById('mdet').innerHTML=`Unit: <span style="color:var(--red)">${u.id}</span><br>Driver: ${u.driver}<br>Plate: <span style="color:var(--amber)">${u.plate}</span><br>Destination: ${dest}<br>Alert to: ${phone||'No SMS (demo)'}`;
   document.getElementById('modal').classList.add('on');
 }
-function closeModal() { document.getElementById('modal').classList.remove('on'); }
+function openModalM(){
+  const idx=document.getElementById('m-dunit').value;
+  const dest=document.getElementById('m-ddest').value.trim();
+  const phone=document.getElementById('m-dphn').value.trim();
+  if(idx===''){toast('⚠️ Select a unit first',true);return;}
+  if(!dest){toast('⚠️ Enter a destination',true);return;}
+  if(!destLatLngM){toast('⚠️ Pick from dropdown',true);return;}
+  const u=units[idx]; pending={idx:+idx,dest,phone,coords:destLatLngM,mobile:true};
+  document.getElementById('mdet').innerHTML=`Unit: <span style="color:var(--red)">${u.id}</span><br>Driver: ${u.driver}<br>Plate: <span style="color:var(--amber)">${u.plate}</span><br>Destination: ${dest}<br>Alert to: ${phone||'No SMS (demo)'}`;
+  document.getElementById('modal').classList.add('on');
+}
+function closeModal(){document.getElementById('modal').classList.remove('on');}
 
-function confirmDispatch() {
-  const saved=pending; pending=null;
-  closeModal();
-  if (!saved) return;
-  const {idx,dest}=saved; const u=units[idx];
-  u.status='enroute'; renderUnits();
-  totalSent++; document.getElementById('sttotal').textContent=totalSent;
-  updActive();
+function confirmDispatch(){
+  const saved=pending; pending=null; closeModal();
+  if(!saved)return;
+  const{idx,dest}=saved; const u=units[idx];
+  u.status='enroute';
+  u.destCoords=saved.coords;
+  u.destLabel=dest;
+  renderUnits(); renderUnitsM();
+  totalSent++; updStats();
   addLog('🚨','lr',u.id+' Dispatched',u.driver+' → '+dest);
   toast('🚨 '+u.id+' dispatched — simulating route');
-  simulate(idx, dest, saved.coords);
+  simulate(idx,dest,saved.coords);
 }
 
-function simulate(idx, destLabel, destCoords) {
+// ── SIMULATE ──
+function simulate(idx,destLabel,destCoords){
   const u=units[idx];
-  const base = myPos || [34.0837, 74.7973];
+  const base=myPos||[34.0837,74.7973];
   const start=[...base];
-  const dest = destCoords ? [...destCoords] : [start[0]+(Math.random()*.022-.004), start[1]+(Math.random()*.022+.006)];
+  const dest=destCoords?[...destCoords]:[start[0]+(Math.random()*.018-.004),start[1]+(Math.random()*.018+.005)];
 
-  if (u.marker)     { map.removeLayer(u.marker); }
-  if (u.destMarker) { map.removeLayer(u.destMarker); }
-  if (u.line)       { map.removeLayer(u.line); }
+  if(u.marker){map.removeLayer(u.marker);}
+  if(u.destMarker){map.removeLayer(u.destMarker);}
+  if(u.line){map.removeLayer(u.line);}
 
   const ae=document.createElement('div'); ae.className='ambdot'; ae.innerHTML='🚑';
   u.marker=L.marker(start,{icon:L.divIcon({className:'',html:ae,iconSize:[34,34],iconAnchor:[17,17]})})
     .addTo(map).bindPopup(`<b>${u.id}</b><br>${u.driver}<br>${u.plate}`);
-
   const de=document.createElement('div'); de.className='destdot'; de.innerHTML='<div class="destin">🏥</div>';
   u.destMarker=L.marker(dest,{icon:L.divIcon({className:'',html:de,iconSize:[26,26],iconAnchor:[13,26]})})
     .addTo(map).bindPopup(`<b>DESTINATION</b><br>${destLabel}`);
-
   u.line=L.polyline([start,dest],{color:'#FF1A1A',weight:3,opacity:.55,dashArray:'8,6'}).addTo(map);
-  map.fitBounds(L.latLngBounds([start,dest]),{padding:[70,70]});
+  map.fitBounds(L.latLngBounds([start,dest]),{padding:[60,60]});
 
-  const bar=document.getElementById('simbar'), fill=document.getElementById('sfill');
-  const pct=document.getElementById('spct'), eta=document.getElementById('seta');
+  const bar=document.getElementById('simbar'),fill=document.getElementById('sfill');
+  const pct=document.getElementById('spct'),eta=document.getElementById('seta');
   document.getElementById('simlbl').textContent=u.id;
   bar.classList.add('on');
-
-  const STEPS=100, DUR=20000; let step=0;
+  const STEPS=100,DUR=20000; let step=0;
   addLog('📡','la',u.id+' En Route','Heading to '+destLabel);
 
   const timer=setInterval(()=>{
     step++;
     const p=step/STEPS;
-    u.marker.setLatLng([start[0]+(dest[0]-start[0])*p, start[1]+(dest[1]-start[1])*p]);
+    u.marker.setLatLng([start[0]+(dest[0]-start[0])*p,start[1]+(dest[1]-start[1])*p]);
     fill.style.width=(p*100)+'%';
     pct.textContent=Math.round(p*100)+'%';
     const s=Math.round((1-p)*DUR/1000);
     eta.textContent=s>0?'ETA '+s+'s':'Arriving...';
-    if (step>=STEPS) {
+    if(step>=STEPS){
       clearInterval(timer);
       u.status='arrived'; bar.classList.remove('on'); fill.style.width='0%';
-      if (u.line){map.removeLayer(u.line);u.line=null;}
-      renderUnits(); updActive();
+      if(u.line){map.removeLayer(u.line);u.line=null;}
+      renderUnits(); renderUnitsM(); updStats();
       addLog('✅','lg',u.id+' Arrived','Reached '+destLabel);
       toast('✅ '+u.id+' arrived at '+destLabel);
     }
-  }, DUR/STEPS);
+  },DUR/STEPS);
 }
 
-function resetUnit(i) {
+function resetUnit(i){
   const u=units[i]; u.status='standby';
-  if (u.marker){map.removeLayer(u.marker);u.marker=null;}
-  if (u.destMarker){map.removeLayer(u.destMarker);u.destMarker=null;}
-  if (u.line){map.removeLayer(u.line);u.line=null;}
-  renderUnits(); updActive();
+  if(u.marker){map.removeLayer(u.marker);u.marker=null;}
+  if(u.destMarker){map.removeLayer(u.destMarker);u.destMarker=null;}
+  if(u.line){map.removeLayer(u.line);u.line=null;}
+  renderUnits(); renderUnitsM(); updStats();
   addLog('🔄','lb',u.id+' Reset','Back on standby');
 }
 
-function updActive() {
-  document.getElementById('stact').textContent=units.filter(x=>x.status==='enroute').length;
+function updStats(){
+  const enroute=units.filter(x=>x.status==='enroute').length;
+  document.getElementById('sttotal').textContent=totalSent;
+  document.getElementById('stact').textContent=enroute;
+  document.getElementById('stunits').textContent=units.length;
+  document.getElementById('m-sttotal').textContent=totalSent;
+  document.getElementById('m-stact').textContent=enroute;
+  document.getElementById('m-stunits').textContent=units.length;
 }
 
-function addLog(icon,cls,title,sub) {
-  const list=document.getElementById('loglist');
-  const t=new Date(), ts=t.getHours().toString().padStart(2,'0')+':'+t.getMinutes().toString().padStart(2,'0');
-  const item=document.createElement('div'); item.className='logitem';
-  item.innerHTML=`<div class="lico ${cls}">${icon}</div><div class="lbody"><div class="ltitle">${title}</div><div class="lsub">${sub}</div></div><div class="ltime">${ts}</div>`;
-  list.insertBefore(item,list.firstChild);
-  if (list.children.length>25) list.removeChild(list.lastChild);
+function addLog(icon,cls,title,sub){
+  ['loglist','m-loglist'].forEach(lid=>{
+    const list=document.getElementById(lid);
+    const t=new Date(),ts=t.getHours().toString().padStart(2,'0')+':'+t.getMinutes().toString().padStart(2,'0');
+    const item=document.createElement('div'); item.className='logitem';
+    item.innerHTML=`<div class="lico ${cls}">${icon}</div><div class="lbody"><div class="ltitle">${title}</div><div class="lsub">${sub}</div></div><div class="ltime">${ts}</div>`;
+    list.insertBefore(item,list.firstChild);
+    if(list.children.length>20)list.removeChild(list.lastChild);
+  });
 }
 
 let tt;
-function toast(msg,warn=false) {
+function toast(msg,warn=false){
   const el=document.getElementById('toast');
   el.textContent=msg; el.style.borderColor=warn?'var(--amber)':'var(--green)'; el.style.color=warn?'var(--amber)':'var(--green)';
   el.classList.add('on'); clearTimeout(tt); tt=setTimeout(()=>el.classList.remove('on'),3000);
 }
 
-function seed() {
+// ═══════════════════════════════════════════════════════
+// KASHMIR LOCATION SEARCH
+// Searches purely from local KASHMIR_LOCATIONS array
+// ═══════════════════════════════════════════════════════
+let locDropTimer={};
+
+function searchKashmirLoc(inputEl, dropId){
+  const q=inputEl.value.trim().toLowerCase();
+  // reset stored coords
+  if(dropId==='locdrop') destLatLng=null;
+  else destLatLngM=null;
+  if(dropId==='locdrop') prevSMS(); else prevSMSM();
+
+  const drop=document.getElementById(dropId);
+  clearTimeout(locDropTimer[dropId]);
+
+  if(q.length<2){drop.style.display='none'; drop.innerHTML=''; return;}
+
+  locDropTimer[dropId]=setTimeout(()=>{
+    // Score each location
+    const results = KASHMIR_LOCATIONS
+      .map(loc=>{
+        const haystack=(loc.n+' '+loc.c+' '+loc.t).toLowerCase();
+        let score=0;
+        if(loc.n.toLowerCase().startsWith(q)) score=100;
+        else if(loc.n.toLowerCase().includes(q)) score=70;
+        else if(haystack.includes(q)) score=40;
+        return {loc,score};
+      })
+      .filter(x=>x.score>0)
+      .sort((a,b)=>b.score-a.score)
+      .slice(0,12);
+
+    if(!results.length){
+      drop.style.display='block';
+      drop.innerHTML='<div style="padding:10px 14px;font-family:JetBrains Mono,monospace;font-size:.65rem;color:var(--muted)">No Kashmir location found</div>';
+      return;
+    }
+
+    drop.innerHTML=''; drop.style.display='block';
+    results.forEach(({loc})=>{
+      const typeColor = loc.t==='hospital'||loc.t==='clinic'?'var(--red)':
+                        loc.t==='road'||loc.t==='street'?'var(--amber)':
+                        loc.t==='mohalla'?'var(--green)':'var(--blue)';
+      const item=document.createElement('div');
+      item.style.cssText='padding:9px 13px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:8px;transition:.15s;';
+      item.innerHTML=`
+        <div style="width:6px;height:6px;border-radius:50%;background:${typeColor};flex-shrink:0;margin-top:5px;"></div>
+        <div style="flex:1;min-width:0;">
+          <div style="color:var(--text);font-size:.78rem;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${loc.n}</div>
+          <div style="color:var(--muted);font-size:.62rem;font-family:'JetBrains Mono',monospace;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${loc.c}</div>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:.52rem;color:${typeColor};background:${typeColor}20;padding:2px 6px;border-radius:4px;flex-shrink:0;text-transform:uppercase;letter-spacing:.5px;">${loc.t}</div>
+      `;
+      item.onmouseenter=()=>item.style.background='var(--s3)';
+      item.onmouseleave=()=>item.style.background='';
+      item.ontouchstart=()=>item.style.background='var(--s3)';
+      item.onclick=()=>selectKashmirLoc(loc, dropId);
+      drop.appendChild(item);
+    });
+  }, 200);
+}
+
+function selectKashmirLoc(loc, dropId){
+  const isM = dropId==='m-locdrop';
+  const inputEl = document.getElementById(isM?'m-ddest':'ddest');
+  inputEl.value=loc.n+', '+loc.c;
+  if(isM) destLatLngM=[loc.lat,loc.lng];
+  else destLatLng=[loc.lat,loc.lng];
+  closeDrop(dropId);
+  if(isM) prevSMSM(); else prevSMS();
+  // Preview on map
+  map.flyTo([loc.lat,loc.lng],15,{duration:1.2});
+  const previewKey=isM?'_prevM':'_prev';
+  if(window[previewKey])map.removeLayer(window[previewKey]);
+  const pe=document.createElement('div'); pe.className='destdot'; pe.innerHTML='<div class="destin">📍</div>';
+  window[previewKey]=L.marker([loc.lat,loc.lng],{
+    icon:L.divIcon({className:'',html:pe,iconSize:[26,26],iconAnchor:[13,26]})
+  }).addTo(map).bindPopup(`<b>DESTINATION PREVIEW</b><br>${loc.n}, ${loc.c}`).openPopup();
+}
+
+function handleLocKey(event, dropId){
+  if(event.key==='Escape') closeDrop(dropId);
+}
+
+function closeDrop(dropId){
+  const d=document.getElementById(dropId);
+  if(d){d.style.display='none';}
+}
+
+// Close dropdowns on outside click/touch
+document.addEventListener('click',e=>{
+  if(!e.target.closest('#tdisp')&&!e.target.closest('#m-dispatch')){
+    closeDrop('locdrop'); closeDrop('m-locdrop');
+  }
+});
+
+// ── SEED DEMO DATA ──
+function seed(){
   const demos=[
     {driver:'Ravi Kumar',plate:'JK01AB1234',id:'AMB-001',phone:'+91 9419001234',hospital:'SMHS Hospital'},
     {driver:'Aijaz Mir',plate:'JK08ZZ0012',id:'AMB-002',phone:'+91 9858005678',hospital:'SKIMS Soura'},
     {driver:'Mushtaq Lone',plate:'JK02XY9988',id:'AMB-003',phone:'+91 7006001122',hospital:'Bone & Spine'},
   ];
-  demos.forEach(d=>{
-    document.getElementById('adrv').value=d.driver; document.getElementById('aplt').value=d.plate;
-    document.getElementById('aid').value=d.id; document.getElementById('aphn').value=d.phone;
-    document.getElementById('ahsp').value=d.hospital; addUnit();
-  });
+  demos.forEach(d=>_addUnit(d));
 }
 
-// ── LOCATION SEARCH ──
-let destLatLng = null;
-let searchTimer = null;
-
-function searchLoc() {
-  const q = document.getElementById('ddest').value.trim();
-  destLatLng = null; // reset when user types again
-  prevSMS();
-  clearTimeout(searchTimer);
-  const drop = document.getElementById('locdrop');
-  if (q.length < 3) { drop.style.display='none'; return; }
-  drop.style.display='block';
-  drop.innerHTML='<div style="padding:10px 14px;font-family:JetBrains Mono,monospace;font-size:.65rem;color:var(--muted)">Searching...</div>';
-  searchTimer = setTimeout(async () => {
-    try {
-      const res = await fetch(`https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(q)}&format=json&limit=8&addressdetails=1&featuretype=settlement&featuretype=road&featuretype=house&bounded=0`, {
-        headers: { 'Accept-Language': 'en', 'User-Agent': 'AmbulERT/1.0' }
-      });
-      const data = await res.json();
-      if (!data.length) {
-        drop.innerHTML='<div style="padding:10px 14px;font-family:JetBrains Mono,monospace;font-size:.65rem;color:var(--muted)">No results found</div>';
-        return;
-      }
-      drop.innerHTML='';
-      data.forEach(place => {
-        const name = place.display_name;
-        const lat = parseFloat(place.lat), lng = parseFloat(place.lon);
-        const primary = place.name || place.address?.road || place.address?.suburb || name.split(',')[0];
-        const secondary = [place.address?.suburb, place.address?.city||place.address?.town||place.address?.village, place.address?.state].filter(Boolean).join(', ');
-        const typeTag = place.type || place.class || '';
-        const tagColor = typeTag.includes('road')||typeTag.includes('street')||typeTag.includes('highway') ? 'var(--amber)' : typeTag.includes('hospital')||typeTag.includes('clinic') ? 'var(--red)' : 'var(--blue)';
-        const item = document.createElement('div');
-        item.style.cssText='padding:9px 14px;cursor:pointer;border-bottom:1px solid var(--border);font-size:.75rem;line-height:1.5;transition:.15s;display:flex;align-items:flex-start;gap:8px;';
-        item.innerHTML=`
-          <div style="margin-top:2px;width:6px;height:6px;border-radius:50%;background:${tagColor};flex-shrink:0;margin-top:5px"></div>
-          <div style="flex:1;min-width:0;">
-            <div style="color:var(--text);font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${primary}</div>
-            <div style="color:var(--muted);font-size:.63rem;font-family:'JetBrains Mono',monospace;margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${secondary||name.split(',').slice(1,3).join(',')}</div>
-          </div>
-          <div style="font-family:'JetBrains Mono',monospace;font-size:.55rem;color:${tagColor};background:${tagColor}22;padding:2px 6px;border-radius:4px;flex-shrink:0;text-transform:uppercase;letter-spacing:.5px">${typeTag}</div>
-        `;
-        item.onmouseenter=()=>item.style.background='var(--s3)';
-        item.onmouseleave=()=>item.style.background='';
-        item.onclick=()=>selectLoc(name, lat, lng);
-        drop.appendChild(item);
-      });
-    } catch(e) {
-      drop.innerHTML='<div style="padding:10px 14px;font-family:JetBrains Mono,monospace;font-size:.65rem;color:var(--red)">Search failed — check connection</div>';
-    }
-  }, 450);
-}
-
-function selectLoc(name, lat, lng) {
-  destLatLng = [lat, lng];
-  document.getElementById('ddest').value = name;
-  closeDrop();
-  prevSMS();
-  // Preview pin on map
-  map.flyTo([lat, lng], 15, { duration: 1.2 });
-  if (window._previewMarker) map.removeLayer(window._previewMarker);
-  const pe = document.createElement('div');
-  pe.className='destdot'; pe.innerHTML='<div class="destin">📍</div>';
-  window._previewMarker = L.marker([lat,lng], {
-    icon: L.divIcon({ className:'', html:pe, iconSize:[26,26], iconAnchor:[13,26] })
-  }).addTo(map).bindPopup(`<b>DESTINATION PREVIEW</b><br>${name}`).openPopup();
-}
-
-function closeDrop() { document.getElementById('locdrop').style.display='none'; }
-document.addEventListener('click', e => { if (!e.target.closest('#tdisp')) closeDrop(); });
-
-window.onload=()=>{ initMap(); seed(); };
+window.onload=()=>{initMap(); seed();};
 </script>
 </body>
 </html>
